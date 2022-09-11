@@ -1,0 +1,17 @@
+<ng-template #content>
+  <span *ngIf="content">
+    <ng-content></ng-content>
+  </span>
+</ng-template>
+
+<button *ngIf="!link"
+        class="button">
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+</button>
+
+<a *ngIf="link"
+   class="button"
+   [routerLink]="link"
+>
+  <ng-container *ngTemplateOutlet="content"></ng-container>
+</a>

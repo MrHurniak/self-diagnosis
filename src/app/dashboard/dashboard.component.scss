@@ -1,0 +1,24 @@
+.header-kpi {
+  font-size: medium;
+}
+.header-cathedra {
+  font-size: small;
+}
+
+.section {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 8px;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  ::ng-deep app-button {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+

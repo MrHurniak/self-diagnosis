@@ -1,0 +1,22 @@
+<app-header>
+  <h2 class="header-kpi">НТУУ "КПІ ім. І. Сікорського"</h2>
+  <h3 class="header-cathedra">Кафедра автоматизації</h3>
+</app-header>
+
+<main>
+  <section class="section">
+    <p>Імітаційне моделювання процесу самодіагностування багатомодульної
+      обчислювальної системи</p>
+    <div class="button-container">
+      <p class="label">Розпочати процес діагностування системи</p>
+      <app-button
+        (click)="openDiagnosis('manual')"
+      >із заданим числом модулів
+      </app-button>
+      <app-button
+        (click)="openDiagnosis('random')"
+      >із випадковим числом модулів
+      </app-button>
+    </div>
+  </section>
+</main>
