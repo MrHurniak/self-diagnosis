@@ -1,15 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-task-info',
   templateUrl: './task-info.component.html',
   styleUrls: ['./task-info.component.scss']
 })
-export class TaskInfoComponent implements OnInit {
+export class TaskInfoComponent {
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
+  @Input() matrix: string[][];
+  @Input() failures: string[];
 
 }

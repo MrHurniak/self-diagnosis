@@ -1,12 +1,26 @@
 <app-header
->Process of system self-diagnosis of {{ count }} modules
+>Process of system self-diagnosis of {{ modulesCount }} modules
 </app-header>
 
 <main class="container">
-  <section class="section">
-    <app-graph-view></app-graph-view>
+  <section class="section section-actions">
+      <app-button class="button"
+      >Next
+      </app-button>
+      <app-button class="button"
+      >Auto
+      </app-button>
   </section>
-  <section class="section">
-    <app-task-info></app-task-info>
+
+  <section class="section section-graph">
+    <app-graph-view
+      [matrix]="matrix"
+    ></app-graph-view>
+  </section>
+
+  <section class="section section-info">
+    <app-task-info
+      [matrix]="matrix"
+    ></app-task-info>
   </section>
 </main>

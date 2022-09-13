@@ -1,1 +1,27 @@
-<p>task-info works!</p>
+<section
+  class="section result-container"
+>
+  <h3 class="table-header"></h3>
+  <table class="table">
+    <th class="empty"></th>
+    <th *ngFor="let row of matrix; let i = index"
+        class=""
+    >{{ i }}</th>
+    <tr *ngFor="let row of matrix; let j = index">
+      <th>{{ j }}</th>
+      <td *ngFor="let cell of row">{{ cell }}</td>
+    </tr>
+  </table>
+</section>
+
+<section
+  class="section failures-container"
+>
+  <h3 class="table-header">Виявлені відмови:</h3>
+
+  <table>
+    <tr>
+      <td *ngFor="let node of failures">{{ node }}</td>
+    </tr>
+  </table>
+</section>

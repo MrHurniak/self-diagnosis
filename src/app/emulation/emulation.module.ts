@@ -5,6 +5,7 @@ import { GraphViewComponent } from './graph-view/graph-view.component';
 import { TaskInfoComponent } from './task-info/task-info.component';
 import { RouterModule } from "@angular/router";
 import { SharedModule } from "../_@shared/shared.module";
+import { NgxGraphModule } from "@swimlane/ngx-graph";
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import { SharedModule } from "../_@shared/shared.module";
         RouterModule.forChild([
             { path: '', component: EmulationComponent },
         ]),
-        SharedModule
+        SharedModule,
+        NgxGraphModule
     ]
 })
 export class EmulationModule { }
