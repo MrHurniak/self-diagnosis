@@ -30,6 +30,8 @@
 .table {
   border-collapse:separate;
   border-spacing:0;
+  max-width: 90%;
+  overflow: auto;
 
   .empty {
     border-left: none;
@@ -47,9 +49,12 @@
   }
 
   th, td {
-    padding:5px 10px;
-    border:1px solid #000;
+    max-width: 1.2em;
+    width: 1.2em;
+    height: 1.2em;
     white-space:nowrap;
     vertical-align:top;
+    text-align: center;
+    font-size: small;
   }
 }

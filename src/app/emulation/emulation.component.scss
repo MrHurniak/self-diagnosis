@@ -9,6 +9,17 @@
   flex-grow: 1;
 }
 
+.actions {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  .button {
+    min-width: 150px;
+  }
+}
+
 .section {
   border: black solid 1px;
 

@@ -1,17 +1,27 @@
 .header {
   width: 100%;
   display: flex;
-  align-items: center;
+  justify-content: space-between;
   background-color: black;
   color: white;
+  box-sizing: border-box;
+  padding: 0 20px;
 
-  &-logo {
-    width: 4em;
-    margin: 10px;
+  &-attributes {
+    display: flex;
+    align-items: center;
   }
+}
 
-  &-text {
-    width: 100%;
-    text-align: left;
-  }
+.logo {
+  width: 4em;
+  margin: 10px;
+}
+
+.title {
+  font-size: medium;
+}
+
+.subtitle {
+  font-size: small;
 }

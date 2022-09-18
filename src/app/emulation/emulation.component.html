@@ -1,17 +1,14 @@
 <app-header
->Process of system self-diagnosis of {{ modulesCount }} modules
+  title="Process of system self-diagnosis of {{ modulesCount }} modules"
+>
+  <div class="actions">
+    <app-button class="button"
+    >Run
+    </app-button>
+  </div>
 </app-header>
 
 <main class="container">
-  <section class="section section-actions">
-      <app-button class="button"
-      >Next
-      </app-button>
-      <app-button class="button"
-      >Auto
-      </app-button>
-  </section>
-
   <section class="section section-graph">
     <app-graph-view
       [matrix]="matrix"

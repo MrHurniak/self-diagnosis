@@ -1,6 +1,13 @@
 <div class="header">
-  <img class="header-logo" src="../assets/images/logo.svg" alt="KPI">
-  <h2 class="header-text">
+  <div class="header-attributes">
+    <img class="logo" src="../assets/images/logo.svg" alt="KPI">
+    <div>
+      <h2 class="title">{{ title }}</h2>
+      <h3 *ngIf="subtitle" class="subtitle">{{ subtitle }}</h3>
+    </div>
+  </div>
+
+  <div class="content">
     <ng-content></ng-content>
-  </h2>
+  </div>
 </div>

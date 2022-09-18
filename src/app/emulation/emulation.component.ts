@@ -1,6 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from "@angular/router";
 import { Subscription } from "rxjs";
+import { RandomService } from "../_@shared/services/random.service";
 
 @Component({
   templateUrl: './emulation.component.html',
@@ -9,41 +10,27 @@ import { Subscription } from "rxjs";
 export class EmulationComponent implements OnDestroy {
 
   private subscription = new Subscription();
-  private readonly minNodes = 10;
-  private readonly maxNodes = 25;
 
   public modulesCount: number;
   public matrix: string[][];
 
   constructor(
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private randomService: RandomService,
   ) {
     this.route.queryParams
       .subscribe(params => {
-        if (params['mode'] === 'random') {
-          this.modulesCount = EmulationComponent.randomInt(
-            this.minNodes, this.maxNodes
-          );
-          return;
+        if (params['size']) {
+          this.modulesCount = parseInt(params['size'], 10) || 18;
+        } else {
+          this.modulesCount = this.randomService.generateSize();
         }
-        this.modulesCount = 18;
+
+        this.matrix = this.randomService.generateMatrix(this.modulesCount);
       });
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
-  }
-
-  ngOnInit(): void {
-    this.matrix = [
-      ['0', '1', '1', '1'],
-      ['1', '0', '1', '0'],
-      ['1', '1', '0', '0'],
-      ['1', '0', '0', '0'],
-    ]
-  }
-
-  public static randomInt(min: number, max: number): number {
-    return Math.floor(min + Math.random() * (max - min + 1));
   }
 }
