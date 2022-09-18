@@ -1,6 +1,25 @@
-<ngx-graph
-  [view]="[width, height]"
-  [links]="_edges"
-  [nodes]="_nodes"
->
-</ngx-graph>
+<svg [attr.width]="width" [attr.height]="height">
+  <ng-container *ngFor="let edge of edges">
+    <line [attr.x1]="edge.x1" [attr.y1]="edge.y1"
+          [attr.x2]="edge.x2" [attr.y2]="edge.y2"
+          [attr.stroke]="edge.color || 'black'"/>
+  </ng-container>
+
+  <ng-container *ngFor="let node of nodes">
+    <circle
+      [attr.cx]="node.x"
+      [attr.cy]="node.y"
+      [attr.r]="nodeRadius"
+      [attr.fill]="node.color || 'black'"
+      (click)="onNodeClick(node)"
+    />
+    <text
+      text-anchor="middle"
+      alignment-baseline="middle"
+      fill="white"
+      [attr.x]="node.x"
+      [attr.y]="node.y"
+      (click)="onNodeClick(node)"
+    >{{ node.id }}</text>
+  </ng-container>
+</svg>
