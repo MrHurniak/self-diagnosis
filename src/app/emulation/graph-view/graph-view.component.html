@@ -1,8 +1,38 @@
+<div class="controls-container">
+  <div class="controls">
+    <app-button
+    >Add node
+    </app-button>
+    <app-button
+    >Add edge
+    </app-button>
+    <app-button
+    >Remove edge
+    </app-button>
+  </div>
+  <div class="controls node-controls" *ngIf="selected">
+    <app-button
+      (click)="toggle(selected)"
+    >{{ selected.disabled ? 'Enable' : 'Disable' }}
+    </app-button>
+    <app-button
+      (click)="delete(selected)"
+    >Delete
+    </app-button>
+    <app-button
+      (click)="deselect()"
+    >Cancel
+    </app-button>
+  </div>
+</div>
+
 <svg [attr.width]="width" [attr.height]="height">
   <ng-container *ngFor="let edge of edges">
     <line [attr.x1]="edge.x1" [attr.y1]="edge.y1"
           [attr.x2]="edge.x2" [attr.y2]="edge.y2"
-          [attr.stroke]="edge.color || 'black'"/>
+          [attr.stroke]="getColor(edge)"
+          (click)="select(edge)"
+    />
   </ng-container>
 
   <ng-container *ngFor="let node of nodes">
@@ -10,8 +40,8 @@
       [attr.cx]="node.x"
       [attr.cy]="node.y"
       [attr.r]="nodeRadius"
-      [attr.fill]="node.color || 'black'"
-      (click)="onNodeClick(node)"
+      [attr.fill]="getColor(node)"
+      (click)="select(node)"
     />
     <text
       text-anchor="middle"
@@ -19,7 +49,7 @@
       fill="white"
       [attr.x]="node.x"
       [attr.y]="node.y"
-      (click)="onNodeClick(node)"
+      (click)="select(node)"
     >{{ node.id }}</text>
   </ng-container>
 </svg>

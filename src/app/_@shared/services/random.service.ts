@@ -6,7 +6,7 @@ export class RandomService {
   public readonly MIN_COUNT = 10;
   public readonly MAX_COUNT = 25;
 
-  private readonly probability = 0.8;
+  private readonly probability = 0.5;
 
   generateSize(): number {
     return this.randomInt(

@@ -1,18 +1,21 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 interface Node {
-  id: number,
+  id: string,
   x: number,
   y: number,
   color?: string,
+  disabled?: boolean,
 }
 
 interface Edge {
+  id: string,
   x1: number,
   y1: number,
   x2: number,
   y2: number,
   color?: string,
+  disabled?: boolean,
 }
 
 @Component({
@@ -22,11 +25,13 @@ interface Edge {
 })
 export class GraphViewComponent {
 
-  @Output() graphEvent = new EventEmitter<{ id: number }>()
+  @Output() graphEvent = new EventEmitter<{ id: string }>()
 
   public readonly width = 700;
   public readonly height = 500;
   public readonly nodeRadius = 15;
+
+  selected: Node | Edge;
 
   edges: Edge[] = [];
   nodes: Node[] = [];
@@ -42,10 +47,12 @@ export class GraphViewComponent {
     this.edges = this.createEdges(this.nodes, matrix);
   }
 
-  onNodeClick(node: Node): void {
-    this.graphEvent.emit({
-      id: node.id,
-    });
+  select(element: Node | Edge): void {
+    if (this.selected === element) {
+      this.selected = null;
+      return;
+    }
+    this.selected = element;
   }
 
   private createNodes(count: number): Node[] {
@@ -58,13 +65,13 @@ export class GraphViewComponent {
     const nodes: Node[] = [];
 
     for (let i = 0; i < count; i++) {
-      const nodeAngle = angle * i;
+      const nodeAngle = angle * i - 90;
 
       const posX = radius * Math.cos(this.toRadians(nodeAngle));
       const posY = radius * Math.sin(this.toRadians(nodeAngle));
 
       nodes.push({
-        id: i,
+        id: `${i}`,
         x: Math.round(posX + xCenter),
         y: Math.round(posY + yCenter),
       })
@@ -82,6 +89,7 @@ export class GraphViewComponent {
           const node2 = nodes[j];
 
           edges.push({
+            id: `${node1.id}:${node2.id}`,
             x1: node1.x,
             y1: node1.y,
             x2: node2.x,
@@ -95,5 +103,28 @@ export class GraphViewComponent {
 
   private toRadians(angle): number {
     return angle * (Math.PI / 180);
+  }
+
+  getColor(element: Node | Edge): string {
+    if (this.selected === element) {
+      return '#2c5777';
+    }
+    return element.disabled ? 'gray' : 'black';
+  }
+
+  toggle(element: Node | Edge): void {
+    element.disabled = !element.disabled; // TODO temp
+
+    this.graphEvent.emit({
+      id: element.id,
+    });
+  }
+
+  deselect(): void {
+    this.selected = null;
+  }
+
+  delete(element: Node | Edge): void {
+    // TODO promt modal
   }
 }
