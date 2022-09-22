@@ -1,0 +1,16 @@
+
+// Z-index Scheme
+$z-under    : -1;
+$z-zero     : 0;
+$z-flat     : 1;
+$z-high     : 10;
+$z-x-high   : 100;
+$z-xx-high  : 1000;
+$z-xxx-high : 10000;
+
+// Dimension
+$d-base: 8px;
+
+@function d($scale) {
+  @return $d-base * $scale;
+}

@@ -4,11 +4,13 @@ import { CommonModule } from "@angular/common";
 import { RouterModule } from "@angular/router";
 import { HeaderComponent } from './header/header.component';
 import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
+import { ModalService } from './modal-service/modal.service';
+import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
   ],
   declarations: [
     ButtonComponent,
@@ -20,5 +22,9 @@ import { ConfirmationModalComponent } from './confirmation-modal/confirmation-mo
     HeaderComponent,
     ConfirmationModalComponent,
   ],
+  providers: [
+    NgbActiveModal,
+    ModalService,
+  ]
 })
 export class SharedModule { }

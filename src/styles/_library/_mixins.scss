@@ -1,0 +1,33 @@
+// Media Queries
+@mixin mq($size, $limiter: "min-width", $max-size: "") {
+  @if ($limiter == "between") {
+    @media only screen and (min-width: $size) and (max-width: $max-size) {
+      @content;
+    }
+  } @else {
+    @media only screen and ($limiter: $size) {
+      @content;
+    }
+  }
+}
+
+@function strip-units($number) {
+  @if type-of($number) == "number" and not unitless($number) {
+    @return $number / ($number * 0 + 1);
+  }
+
+  @return $number;
+}
+
+// Pixels to Emx
+@function em($pxval, $base: 16) {
+  $pxval: strip-units($pxval);
+
+  @return ($pxval / $base) + em;
+}
+
+@function rem($pxval, $base: 16) {
+  $pxval: strip-units($pxval);
+
+  @return ($pxval / $base) + rem;
+}
