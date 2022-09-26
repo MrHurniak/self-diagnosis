@@ -1,5 +1,4 @@
 <div class="modal-header">
-  <h4 *ngIf="!!title" class="modal-title" id="modal-title">{{ title }}</h4>
   <button
     type="button"
     class="btn-close"
@@ -10,19 +9,17 @@
 
 <div class="modal-body">
   <p class="message">{{ message }}</p>
+
+  <input class="data-input" type="number" [attr.min]="min" [attr.max]="max" [formControl]="form"/>
+
 </div>
 
 <div class="modal-footer">
   <app-button
     class="button-action"
-    type="success"
-    (click)="modal.close()"
-  >Ok
-  </app-button>
-  <app-button
-    class="button-action"
-    type="danger"
-    (click)="modal.dismiss()"
-  >Cancel
+    type="primary"
+    [disabled]="!form.valid"
+    (click)="submit()"
+  >Submit
   </app-button>
 </div>

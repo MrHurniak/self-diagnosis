@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 
 @Component({
@@ -9,4 +9,8 @@ import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 export class ConfirmationModalComponent {
 
   constructor(public modal: NgbActiveModal) {}
+
+  @Input() title = '';
+  @Input() message = 'Are you sure?';
+
 }

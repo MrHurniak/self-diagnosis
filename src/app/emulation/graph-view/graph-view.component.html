@@ -30,6 +30,13 @@
   <ng-container *ngFor="let edge of edges">
     <line [attr.x1]="edge.x1" [attr.y1]="edge.y1"
           [attr.x2]="edge.x2" [attr.y2]="edge.y2"
+          stroke-opacity="0"
+          stroke-width="5"
+          stroke="white"
+          (click)="select(edge)"
+    />
+    <line [attr.x1]="edge.x1" [attr.y1]="edge.y1"
+          [attr.x2]="edge.x2" [attr.y2]="edge.y2"
           [attr.stroke]="getColor(edge)"
           (click)="select(edge)"
     />

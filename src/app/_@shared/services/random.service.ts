@@ -1,16 +1,16 @@
 import { Injectable } from "@angular/core";
 
+export const MIN_COUNT = 10;
+export const MAX_COUNT = 25;
+
 @Injectable()
 export class RandomService {
-
-  public readonly MIN_COUNT = 10;
-  public readonly MAX_COUNT = 25;
 
   private readonly probability = 0.5;
 
   generateSize(): number {
     return this.randomInt(
-      this.MIN_COUNT, this.MAX_COUNT
+      MIN_COUNT, MAX_COUNT
     )
   }
 

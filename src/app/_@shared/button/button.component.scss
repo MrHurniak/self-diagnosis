@@ -1,8 +1,11 @@
+@import "src/styles/_library";
+// https://getcssscan.com/css-buttons-examples
+
 .button {
   background-color: #e1ecf4;
   border-radius: 3px;
   border: 1px solid #7aa7c7;
-  box-shadow: rgba(255, 255, 255, .7) 0 1px 0 0 inset;
+  box-shadow: rgba($white, .7) 0 1px 0 0 inset;
   box-sizing: border-box;
   color: #39739d;
   cursor: pointer;
@@ -40,4 +43,49 @@
   background-color: #a0c7e4;
   box-shadow: none;
   color: #2c5777;
+}
+
+.primary {
+  background-color: $blue-light;
+  color: $white;
+}
+
+.primary:hover,
+.primary:focus {
+  background-color: $blue-medium;
+}
+
+.primary:focus {
+  box-shadow: 0 0 0 4px rgba($blue-light, .15);
+}
+
+.primary:active {
+  background-color: $blue-light;
+}
+
+.success {
+  background-color: $success-green;
+  color: $white;
+}
+
+.success:hover,
+.success:focus {
+  background-color: rgba($success-green, 0.7);
+}
+
+.danger {
+  background-color: $error-red;
+  color: $white;
+}
+
+.danger:hover,
+.danger:focus {
+  background-color: rgba($error-red, 0.7);
+}
+
+.disabled {
+  pointer-events: none;
+  box-shadow: none;
+  opacity: .8;
+  background-color: rgba($gray-medium, .5);
 }

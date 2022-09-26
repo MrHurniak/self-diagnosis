@@ -1,32 +1,28 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from "@angular/router";
-import {
-  ModalService
-} from "../_@shared/modal-service/modal.service";
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { ModalService } from '../_@shared/modal-service/modal.service';
+import { MAX_COUNT, MIN_COUNT } from '../_@shared/services/random.service';
 
 @Component({
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
 
   constructor(
     private router: Router,
     private modal: ModalService,
   ) { }
 
-  ngOnInit(): void {
-  }
 
   openDiagnosis(type: 'manual' | 'random'): Promise<any> {
     if (type === 'random') {
       return this.router.navigate(['task'])
     }
-    return this.modal.confirm()
-      .then(result => {
-        if (result) {
-          return this.router.navigate(['task']);
-        } else return null;
-      });
+    return this.modal.numberDialog(MIN_COUNT, MAX_COUNT)
+      .then(size =>
+          this.router.navigate(['task'], { queryParams: { size } }),
+        () => null
+      );
   }
 }

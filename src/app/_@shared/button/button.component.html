@@ -5,12 +5,15 @@
 </ng-template>
 
 <button *ngIf="!link"
-        class="button">
+        class="button {{ type }}"
+        [ngClass]="{ 'disabled': disabled }"
+>
   <ng-container *ngTemplateOutlet="content"></ng-container>
 </button>
 
 <a *ngIf="link"
-   class="button"
+   class="button {{ type }}"
+   [ngClass]="{ 'disabled': disabled }"
    [routerLink]="link"
 >
   <ng-container *ngTemplateOutlet="content"></ng-container>

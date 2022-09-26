@@ -6,16 +6,20 @@ import { HeaderComponent } from './header/header.component';
 import { ConfirmationModalComponent } from './confirmation-modal/confirmation-modal.component';
 import { ModalService } from './modal-service/modal.service';
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { NumberDialogComponent } from './number-dialog/number-dialog.component';
+import { ReactiveFormsModule } from "@angular/forms";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    RouterModule,
-  ],
+    imports: [
+        CommonModule,
+        RouterModule,
+        ReactiveFormsModule,
+    ],
   declarations: [
     ButtonComponent,
     HeaderComponent,
     ConfirmationModalComponent,
+    NumberDialogComponent,
   ],
   exports: [
     ButtonComponent,

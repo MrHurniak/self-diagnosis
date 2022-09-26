@@ -1,0 +1,13 @@
+@import "src/styles/_library";
+
+.modal-body {
+  display: flex;
+}
+
+.message {
+  margin: 0 d(3);
+}
+
+.data-input {
+  max-width: d(5);
+}
