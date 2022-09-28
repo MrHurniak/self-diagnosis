@@ -1,25 +1,29 @@
 <div class="controls-container">
   <div class="controls">
     <app-button
+      [disabled]="editDisabled"
       (click)="addNode()"
     >Add node
     </app-button>
     <app-button
+      [disabled]="editDisabled"
       (click)="addEdge()"
     >Add edge
     </app-button>
     <app-button
+      [disabled]="editDisabled"
       (click)="removeEdge()"
     >Remove edge
     </app-button>
   </div>
   <div class="controls node-controls" *ngIf="selected">
     <app-button
-      (click)="toggle(selected)"
+      (click)="toggle(selected); deselect()"
     >{{ selected.disabled ? 'Enable' : 'Disable' }}
     </app-button>
     <app-button
-      (click)="delete(selected)"
+      [disabled]="editDisabled"
+      (click)="delete(selected); deselect()"
     >Delete
     </app-button>
     <app-button

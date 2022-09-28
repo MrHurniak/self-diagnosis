@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { EMPTY, PRESENT } from '../utils/constants';
 
 export const MIN_COUNT = 10;
 export const MAX_COUNT = 25;
@@ -9,13 +10,13 @@ export class RandomService {
 
   private readonly probability = 0.5;
 
-  generateSize(): number {
+  public generateSize(): number {
     return this.randomInt(
       MIN_COUNT, MAX_COUNT
     )
   }
 
-  generateMatrix(size: number): string[][] {
+  public generateMatrix(size: number): string[][] {
     const res: string[][] = this.generateEmpty(size);
     for (let i = 0; i < size; i++) {
       for (let j = i; j < size; j++) {
@@ -23,12 +24,16 @@ export class RandomService {
           continue;
         }
         if (Math.random() < this.probability) {
-          res[i][j] = '1';
-          res[j][i] = '1';
+          res[i][j] = PRESENT;
+          res[j][i] = PRESENT;
         }
       }
     }
     return res;
+  }
+
+  public randomInt(min: number, max: number): number {
+    return Math.floor(min + Math.random() * (max - min + 1));
   }
 
   private generateEmpty(size: number): string[][] {
@@ -36,13 +41,9 @@ export class RandomService {
     for (let i = 0; i < size; i++) {
       res.push([]);
       for (let j = 0; j < size; j++) {
-        res[i].push('0');
+        res[i].push(EMPTY);
       }
     }
     return res;
-  }
-
-  randomInt(min: number, max: number): number {
-    return Math.floor(min + Math.random() * (max - min + 1));
   }
 }

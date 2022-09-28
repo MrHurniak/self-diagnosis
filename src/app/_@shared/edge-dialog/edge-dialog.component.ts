@@ -21,8 +21,7 @@ export class EdgeDialogComponent implements OnInit {
 
   constructor(
     public modal: NgbActiveModal
-  ) {
-  }
+  ) { }
 
   ngOnInit(): void {
     this.initForm()

@@ -8,7 +8,9 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 })
 export class ConfirmationModalComponent {
 
-  constructor(public modal: NgbActiveModal) {}
+  constructor(
+    public modal: NgbActiveModal
+  ) { }
 
   @Input() title = '';
   @Input() message = 'Are you sure?';

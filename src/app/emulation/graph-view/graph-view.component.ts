@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GraphEvent } from '../emulation.component.types';
+import { IDS_DELIMITER, PRESENT } from '../../_@shared/utils/constants';
+import { MathUtil } from '../../_@shared/utils/math.util';
 
 interface Node {
   id: string,
@@ -27,6 +29,7 @@ interface Edge {
 export class GraphViewComponent {
 
   @Output() graphEvent = new EventEmitter<GraphEvent>()
+  @Input() editDisabled = false;
 
   public readonly width = 700;
   public readonly height = 500;
@@ -53,6 +56,64 @@ export class GraphViewComponent {
     this.selected = element;
   }
 
+  getColor(element: Node | Edge): string {
+    if (this.selected === element) {
+      return '#2c5777';
+    }
+    return element.disabled ? 'gray' : 'black';
+  }
+
+  toggle(element: Node | Edge): void {
+    element.disabled = !element.disabled; // TODO temp
+
+    this.graphEvent.emit({
+      id: element.id,
+      target: element.id.includes(IDS_DELIMITER) ? 'edge' : 'node',
+      type: 'toggle',
+    });
+  }
+
+  deselect(): void {
+    this.selected = null;
+  }
+
+  delete(element: Node | Edge): void {
+    if (this.editDisabled) return;
+
+    this.graphEvent.emit({
+      id: element.id,
+      target: element.id.includes(IDS_DELIMITER) ? 'edge' : 'node',
+      type: 'delete',
+    })
+  }
+
+  addNode() {
+    if (this.editDisabled) return;
+
+    this.graphEvent.emit({
+      target: 'node',
+      type: 'add',
+    })
+  }
+
+  addEdge() {
+    if (this.editDisabled) return;
+
+    this.graphEvent.emit({
+      target: 'edge',
+      type: 'add',
+    });
+  }
+
+  removeEdge() {
+    if (this.editDisabled) return;
+
+    this.graphEvent.emit({
+      target: 'edge',
+      type: 'delete',
+    });
+  }
+
   private createNodes(count: number): Node[] {
     const xCenter = this.width / 2;
     const yCenter = this.height / 2;
@@ -65,8 +126,8 @@ export class GraphViewComponent {
     for (let i = 0; i < count; i++) {
       const nodeAngle = angle * i - 90;
 
-      const posX = radius * Math.cos(this.toRadians(nodeAngle));
-      const posY = radius * Math.sin(this.toRadians(nodeAngle));
+      const posX = radius * Math.cos(MathUtil.toRadians(nodeAngle));
+      const posY = radius * Math.sin(MathUtil.toRadians(nodeAngle));
 
       nodes.push({
         id: `${i}`,
@@ -82,12 +143,12 @@ export class GraphViewComponent {
     for (let i = 0; i < matrix.length; i++) {
       for (let j = i; j < matrix[i].length; j++) {
         if (i == j) continue;
-        if (matrix[i][j] === '1') {
+        if (matrix[i][j] === PRESENT) {
           const node1 = nodes[i];
           const node2 = nodes[j];
 
           edges.push({
-            id: `${node1.id}:${node2.id}`,
+            id: `${node1.id}${IDS_DELIMITER}${node2.id}`,
             x1: node1.x,
             y1: node1.y,
             x2: node2.x,
@@ -97,59 +158,5 @@ export class GraphViewComponent {
       }
     }
     return edges;
-  }
-
-  private toRadians(angle): number {
-    return angle * (Math.PI / 180);
-  }
-
-  getColor(element: Node | Edge): string {
-    if (this.selected === element) {
-      return '#2c5777';
-    }
-    return element.disabled ? 'gray' : 'black';
-  }
-
-  toggle(element: Node | Edge): void {
-    element.disabled = !element.disabled; // TODO temp
-
-    this.graphEvent.emit({
-      id: element.id,
-      target: element.id.includes(':') ? 'edge' : 'node',
-      type: 'toggle',
-    });
-  }
-
-  deselect(): void {
-    this.selected = null;
-  }
-
-  delete(element: Node | Edge): void {
-    this.graphEvent.emit({
-      id: element.id,
-      target: element.id.includes(':') ? 'edge' : 'node',
-      type: 'delete',
-    })
-  }
-
-  addNode() {
-    this.graphEvent.emit({
-      target: 'node',
-      type: 'add',
-    })
-  }
-
-  addEdge() {
-    this.graphEvent.emit({
-      target: 'edge',
-      type: 'add',
-    });
-  }
-
-  removeEdge() {
-    this.graphEvent.emit({
-      target: 'edge',
-      type: 'delete',
-    });
   }
 }

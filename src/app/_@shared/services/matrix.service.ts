@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { EMPTY, PRESENT, UNKNOWN } from "../utils/constants";
 
 @Injectable()
 export class MatrixService {
@@ -6,12 +7,12 @@ export class MatrixService {
   public createNode(matrix: string[][]): string[][] {
     const tmp = [];
     for (let i = 0; i < matrix.length; i++) {
-      matrix[i].push('0');
-      tmp.push('0');
+      matrix[i].push(EMPTY);
+      tmp.push(EMPTY);
     }
-    tmp.push('0')
+    tmp.push(EMPTY);
     matrix.push(tmp);
-    return this.copy(matrix)
+    return this.copy(matrix);
   }
 
   public deleteNode(matrix: string[][],
@@ -35,13 +36,24 @@ export class MatrixService {
 
   public deleteEdge(matrix: string[][],
                     id1: number, id2: number): string[][] {
-    return this.fillEdge(matrix, id1, id2, '0');
+    return this.fillEdge(matrix, id1, id2, EMPTY);
 
   }
 
   public createEdge(matrix: string[][],
                     id1: number, id2: number): string[][] {
-    return this.fillEdge(matrix, id1, id2, '1');
+    return this.fillEdge(matrix, id1, id2, PRESENT);
+  }
+
+  public initEmptyMatrix(size: number, filler = UNKNOWN): string[][] {
+    const result = [];
+    for (let i = 0; i < size; i++) {
+      result[i] = [];
+      for (let j = 0; j < size; j++) {
+        result[i].push(filler);
+      }
+    }
+    return result;
   }
 
   private fillEdge(matrix: string[][],

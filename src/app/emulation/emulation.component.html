@@ -1,9 +1,16 @@
 <app-header
-  title="Process of system self-diagnosis of {{ modulesCount }} modules"
+  title="Process of system self-diagnosis of {{ size }} modules"
 >
   <div class="actions">
-    <app-button class="button"
-    >Run
+    <app-button *ngIf="started"
+      class="button"
+      (click)="reset()"
+    >Reset
+    </app-button>
+    <app-button
+      class="button"
+      (click)="run()"
+    >{{ running ? 'PAUSE' : 'RUN' }}
     </app-button>
   </div>
 </app-header>
@@ -13,12 +20,14 @@
     <app-graph-view
       (graphEvent)="handleGraphEvent($event)"
       [matrix]="matrix"
+      [editDisabled]="started"
     ></app-graph-view>
   </section>
 
   <section class="section section-info">
     <app-task-info
-      [matrix]="matrix"
+      [matrix]="result"
+      [failures]="failures"
     ></app-task-info>
   </section>
 </main>

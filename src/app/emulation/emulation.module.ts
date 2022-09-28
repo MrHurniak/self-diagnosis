@@ -21,10 +21,6 @@ import { MatrixService } from '../_@shared/services/matrix.service';
       { path: '', component: EmulationComponent },
     ]),
     SharedModule,
-  ],
-  providers: [
-    RandomService,
-    MatrixService,
   ]
 })
 export class EmulationModule { }
