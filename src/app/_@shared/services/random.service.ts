@@ -1,7 +1,8 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 
 export const MIN_COUNT = 10;
 export const MAX_COUNT = 25;
+export const DEFAULT_COUNT = 18;
 
 @Injectable()
 export class RandomService {

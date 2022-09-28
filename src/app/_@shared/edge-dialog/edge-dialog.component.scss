@@ -1,0 +1,23 @@
+@import "src/styles/_library";
+
+.modal-body {
+  display: flex;
+}
+
+.message, .delimiter {
+  margin: 0 d(3);
+}
+
+.data-input::-webkit-outer-spin-button,
+.data-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.data-input[type=number] {
+  -moz-appearance:textfield;
+}
+
+.data-input {
+  max-width: d(5);
+}

@@ -84,8 +84,9 @@
 }
 
 .disabled {
-  pointer-events: none;
   box-shadow: none;
   opacity: .8;
   background-color: rgba($gray-medium, .5);
+  pointer-events: none;
+  cursor: not-allowed;
 }

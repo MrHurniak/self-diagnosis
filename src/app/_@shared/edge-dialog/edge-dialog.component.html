@@ -1,0 +1,38 @@
+<div class="modal-header">
+  <button
+    type="button"
+    class="btn-close"
+    aria-describedby="modal-title"
+    (click)="modal.dismiss()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <p class="message">{{ message }}</p>
+  <form class="form"
+        [formGroup]="form"
+  >
+    <input class="data-input"
+           type="number"
+           min="0"
+           pattern="[0-9]+"
+           formControlName="id1"/>
+    <span class="delimiter">and</span>
+    <input class="data-input"
+           type="number"
+           pattern="[0-9]+"
+           min="0"
+           formControlName="id2"/>
+  </form>
+
+</div>
+
+<div class="modal-footer">
+  <app-button
+    class="button-action"
+    type="primary"
+    [disabled]="!form.valid"
+    (click)="submit()"
+  >Submit
+  </app-button>
+</div>

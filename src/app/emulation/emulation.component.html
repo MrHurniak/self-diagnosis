@@ -11,6 +11,7 @@
 <main class="container">
   <section class="section section-graph">
     <app-graph-view
+      (graphEvent)="handleGraphEvent($event)"
       [matrix]="matrix"
     ></app-graph-view>
   </section>

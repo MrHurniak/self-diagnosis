@@ -6,6 +6,7 @@ import {
 import {
   NumberDialogComponent
 } from '../number-dialog/number-dialog.component';
+import { EdgeDialogComponent } from '../edge-dialog/edge-dialog.component';
 
 @Injectable()
 export class ModalService {
@@ -33,5 +34,13 @@ export class ModalService {
 
     return confirmation.result
       .then(() => true, () => false);
+  }
+
+  public edgeDialog(message?: string): Promise<number[]> {
+    let edgeDialog = this.modal.open(EdgeDialogComponent);
+    if (message) edgeDialog.componentInstance.message = message;
+
+    return edgeDialog.result
+      .then(value => value, () => null);
   }
 }

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { GraphEvent } from '../emulation.component.types';
 
 interface Node {
   id: string,
@@ -25,7 +26,7 @@ interface Edge {
 })
 export class GraphViewComponent {
 
-  @Output() graphEvent = new EventEmitter<{ id: string }>()
+  @Output() graphEvent = new EventEmitter<GraphEvent>()
 
   public readonly width = 700;
   public readonly height = 500;
@@ -40,9 +41,6 @@ export class GraphViewComponent {
 
   @Input()
   set matrix(matrix: string[][]) {
-    if (!matrix.length) {
-      return;
-    }
     this.nodes = this.createNodes(matrix.length);
     this.edges = this.createEdges(this.nodes, matrix);
   }
@@ -117,6 +115,8 @@ export class GraphViewComponent {
 
     this.graphEvent.emit({
       id: element.id,
+      target: element.id.includes(':') ? 'edge' : 'node',
+      type: 'toggle',
     });
   }
 
@@ -125,6 +125,31 @@ export class GraphViewComponent {
   }
 
   delete(element: Node | Edge): void {
-    // TODO promt modal
+    this.graphEvent.emit({
+      id: element.id,
+      target: element.id.includes(':') ? 'edge' : 'node',
+      type: 'delete',
+    })
+  }
+
+  addNode() {
+    this.graphEvent.emit({
+      target: 'node',
+      type: 'add',
+    })
+  }
+
+  addEdge() {
+    this.graphEvent.emit({
+      target: 'edge',
+      type: 'add',
+    });
+  }
+
+  removeEdge() {
+    this.graphEvent.emit({
+      target: 'edge',
+      type: 'delete',
+    });
   }
 }

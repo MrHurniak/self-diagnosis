@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
-import { FormControl, Validators } from "@angular/forms";
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { FormControl, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-number-dialog',
@@ -30,13 +30,13 @@ export class NumberDialogComponent implements OnInit {
     }
   }
 
-  @Input("min")
+  @Input('min')
   set minSetter(min: number) {
     this.min = min;
     this.form?.updateValueAndValidity();
   }
 
-  @Input("max")
+  @Input('max')
   set maxSetter(max: number) {
     this.max = max;
     this.form?.updateValueAndValidity();
