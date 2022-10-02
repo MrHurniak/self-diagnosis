@@ -9,12 +9,13 @@ import { ModalService } from '../_@shared/modal-service/modal.service';
 import { MatrixService } from '../_@shared/services/matrix.service';
 import { Subscription } from 'rxjs';
 import { IDS_DELIMITER } from '../_@shared/utils/constants';
+import { EmulationService } from './logic/emulation.service';
 
 @Component({
   templateUrl: './emulation.component.html',
   styleUrls: ['./emulation.component.scss']
 })
-export class EmulationComponent implements OnDestroy{
+export class EmulationComponent implements OnDestroy {
 
   private subscription = new Subscription();
 
@@ -22,6 +23,7 @@ export class EmulationComponent implements OnDestroy{
   public matrix: string[][];
   public result: string[][];
   public failures = [];
+  public selectedItems = [];
 
   public started = false;
   public running = false;
@@ -31,6 +33,7 @@ export class EmulationComponent implements OnDestroy{
     private randomService: RandomService,
     private matrixService: MatrixService,
     private modalService: ModalService,
+    private emulation: EmulationService,
   ) {
     this.route.queryParams
       .subscribe(params => {
@@ -49,17 +52,29 @@ export class EmulationComponent implements OnDestroy{
   ngOnInit() {
     this.matrix = this.randomService.generateMatrix(this.size);
     this.result = this.matrixService.initEmptyMatrix(this.size);
+
+    this.subscription.add(this.emulation.processing.subscribe(ids => {
+      this.selectedItems = ids;
+    }));
+
+    this.subscription.add(this.emulation.state.subscribe(state => {
+      this.running = !state.paused;
+      this.started = state.started;
+    }));
   }
 
   public run() {
-    this.started = true;
-    this.running = !this.running;
+    if (!this.started) {
+      this.emulation.start(this.matrix);
+      return;
+    }
+    this.emulation.pause();
   }
 
   public reset() {
-    this.started = false;
-    this.running = false;
+    this.emulation.stop();
     this.failures = [];
+    this.selectedItems = [];
     this.result = this.matrixService.initEmptyMatrix(this.size);
   }
 

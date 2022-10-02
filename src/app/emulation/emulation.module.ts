@@ -5,8 +5,7 @@ import { GraphViewComponent } from './graph-view/graph-view.component';
 import { TaskInfoComponent } from './task-info/task-info.component';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../_@shared/shared.module';
-import { RandomService } from '../_@shared/services/random.service';
-import { MatrixService } from '../_@shared/services/matrix.service';
+import { EmulationService } from './logic/emulation.service';
 
 
 @NgModule({
@@ -21,6 +20,9 @@ import { MatrixService } from '../_@shared/services/matrix.service';
       { path: '', component: EmulationComponent },
     ]),
     SharedModule,
+  ],
+  providers: [
+    EmulationService,
   ]
 })
 export class EmulationModule { }

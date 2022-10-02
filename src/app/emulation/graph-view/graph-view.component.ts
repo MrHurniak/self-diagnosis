@@ -30,6 +30,7 @@ export class GraphViewComponent {
 
   @Output() graphEvent = new EventEmitter<GraphEvent>()
   @Input() editDisabled = false;
+  @Input() highlighted = [];
 
   public readonly width = 700;
   public readonly height = 500;
@@ -57,6 +58,9 @@ export class GraphViewComponent {
   }
 
   getColor(element: Node | Edge): string {
+    if (this.highlighted.includes(element.id)) {
+      return 'red';
+    }
     if (this.selected === element) {
       return '#2c5777';
     }
