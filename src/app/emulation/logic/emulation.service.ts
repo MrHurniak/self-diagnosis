@@ -12,10 +12,13 @@ export interface State {
 export class EmulationService {
 
   public readonly processing = new EventEmitter<string[]>();
-  public readonly state = new EventEmitter<State>();
+  public readonly stateChange = new EventEmitter<State>();
 
-  private started = false;
-  private paused = false;
+  private state: State = {
+    started: false,
+    paused: false,
+  };
+
   private nodes: Node[] = [];
   private edges: Edge[] = [];
 
@@ -24,13 +27,13 @@ export class EmulationService {
   ) { }
 
   public pause(): void {
-    this.paused = !this.paused;
+    this.state.paused = !this.state.paused;
     this.publishState();
   }
 
   public stop(): void {
-    this.started = false;
-    this.paused = true;
+    this.state.started = false;
+    this.state.paused = true;
     this.nodes = [];
     this.edges = [];
     this.publishState();
@@ -49,8 +52,8 @@ export class EmulationService {
 
   public start(matrix: string[][],
                disabledNodes: string[], disabledEdges: string[]): void {
-    this.started = true;
-    this.paused = false;
+    this.state.started = true;
+    this.state.paused = false;
     this.publishState();
 
     // initialization
@@ -64,11 +67,11 @@ export class EmulationService {
   }
 
   private call(items: Item[]): void {
-    if (!this.started) {
+    if (!this.state.started) {
       return;
     }
 
-    if (this.paused) {
+    if (this.state.paused) {
       setTimeout(() => this.call(items), DELAY);
       return;
     }
@@ -91,10 +94,7 @@ export class EmulationService {
   }
 
   private publishState(): void {
-    this.state.emit({
-      started: this.started,
-      paused: this.paused
-    });
+    this.stateChange.emit(this.state);
   }
 
   private createNodes(matrix: string[][]): void {

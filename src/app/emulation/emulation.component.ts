@@ -56,15 +56,18 @@ export class EmulationComponent implements OnDestroy {
     this.matrix = this.randomService.generateMatrix(this.size);
     this.result = this.matrixService.initEmptyMatrix(this.size);
 
-    this.subscription.add(this.emulation.processing.subscribe(ids => {
-      this.selectedItems = ids;
-    }));
+    this.subscription.add(
+      this.emulation.processing.subscribe(ids => {
+        this.selectedItems = ids;
+      })
+    );
 
-    this.subscription.add(this.emulation.state.subscribe(state => {
-      console.log(state);
-      this.running = !state.paused;
-      this.started = state.started;
-    }));
+    this.subscription.add(
+      this.emulation.stateChange.subscribe(state => {
+        this.running = !state.paused;
+        this.started = state.started;
+      })
+    );
   }
 
   public run() {
