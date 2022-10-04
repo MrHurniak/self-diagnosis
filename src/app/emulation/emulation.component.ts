@@ -9,7 +9,7 @@ import { ModalService } from '../_@shared/modal-service/modal.service';
 import { MatrixService } from '../_@shared/services/matrix.service';
 import { Subscription } from 'rxjs';
 import { IDS_DELIMITER } from '../_@shared/utils/constants';
-import { EmulationService } from './logic/emulation.service';
+import { EmulationService, Processing } from './logic/emulation.service';
 
 @Component({
   templateUrl: './emulation.component.html',
@@ -57,9 +57,9 @@ export class EmulationComponent implements OnDestroy {
     this.result = this.matrixService.initEmptyMatrix(this.size);
 
     this.subscription.add(
-      this.emulation.processing.subscribe(ids => {
-        this.selectedItems = ids;
-      })
+      this.emulation.processing.subscribe(
+        event => this.updateDisabled(event)
+      )
     );
 
     this.subscription.add(
@@ -167,6 +167,19 @@ export class EmulationComponent implements OnDestroy {
       items.splice(index, 1);
     } else {
       items.push(id);
+    }
+  }
+
+  private updateDisabled(event: Processing): void {
+    const index = this.selectedItems.indexOf(event.id);
+    if (event.value) {
+      if (index < 0) {
+        this.selectedItems.push(event.id);
+      }
+      return;
+    }
+    if (index > -1) {
+      this.selectedItems.splice(index, 1);
     }
   }
 }

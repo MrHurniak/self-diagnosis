@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { DELAY, PRESENT } from '../../_@shared/utils/constants';
+import { PRESENT } from '../../_@shared/utils/constants';
 import { RandomService } from '../../_@shared/services/random.service';
 import { Item, Node, Edge } from './item';
 
@@ -8,10 +8,15 @@ export interface State {
   paused: boolean,
 }
 
+export interface Processing {
+  id: string,
+  value: boolean,
+}
+
 @Injectable()
 export class EmulationService {
 
-  public readonly processing = new EventEmitter<string[]>();
+  public readonly processing = new EventEmitter<Processing>();
   public readonly stateChange = new EventEmitter<State>();
 
   private state: State = {
@@ -63,34 +68,7 @@ export class EmulationService {
 
     // start
     const id = this.random.randomInt(0, matrix.length - 1);
-    this.call([this.nodes[id]]);
-  }
-
-  private call(items: Item[]): void {
-    if (!this.state.started) {
-      return;
-    }
-
-    if (this.state.paused) {
-      setTimeout(() => this.call(items), DELAY);
-      return;
-    }
-
-    console.log('call', items);
-    this.processing.emit(items.map(item => item.id));
-
-    let newItems = [];
-    for (let item of items) {
-      const items1 = item.pass();
-      newItems = newItems.concat(items1); // TODO Add unique values only!!!
-    }
-
-    if (!newItems.length) {
-      console.error('There is no any items');
-      return;
-    }
-
-    setTimeout(() => this.call(Array.from(new Set(newItems))), DELAY);
+    this.nodes[id].pass(null, null);
   }
 
   private publishState(): void {
@@ -99,7 +77,7 @@ export class EmulationService {
 
   private createNodes(matrix: string[][]): void {
     for (let i = 0; i < matrix.length; i++) {
-      let node = new Node(i);
+      let node = new Node(i, this.state, this.processing);
       this.nodes.push(node);
     }
   }
@@ -112,7 +90,7 @@ export class EmulationService {
         if (matrix[i][j] === PRESENT) {
           const node1 = this.nodes[i];
           const node2 = this.nodes[j];
-          const edge = new Edge(i, j);
+          const edge = new Edge(i, j, this.state, this.processing);
           edge.links.push(node1, node2);
           node1.links.push(edge);
           node2.links.push(edge);
