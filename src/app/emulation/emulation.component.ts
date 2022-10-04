@@ -19,6 +19,9 @@ export class EmulationComponent implements OnDestroy {
 
   private subscription = new Subscription();
 
+  private disabledNodes: string[] = [];
+  private disabledEdges: string[] = [];
+
   public size: number;
   public matrix: string[][];
   public result: string[][];
@@ -58,6 +61,7 @@ export class EmulationComponent implements OnDestroy {
     }));
 
     this.subscription.add(this.emulation.state.subscribe(state => {
+      console.log(state);
       this.running = !state.paused;
       this.started = state.started;
     }));
@@ -65,7 +69,9 @@ export class EmulationComponent implements OnDestroy {
 
   public run() {
     if (!this.started) {
-      this.emulation.start(this.matrix);
+      this.emulation.start(this.matrix, this.disabledNodes, this.disabledEdges);
+      this.disabledNodes = [];
+      this.disabledEdges = [];
       return;
     }
     this.emulation.pause();
@@ -75,6 +81,8 @@ export class EmulationComponent implements OnDestroy {
     this.emulation.stop();
     this.failures = [];
     this.selectedItems = [];
+    this.disabledEdges = [];
+    this.disabledNodes = [];
     this.result = this.matrixService.initEmptyMatrix(this.size);
   }
 
@@ -95,6 +103,11 @@ export class EmulationComponent implements OnDestroy {
         }
         break;
       case 'toggle':
+        if (this.started) {
+          this.emulation.toggle($event.id, $event.target);
+        } else {
+          this.initToggle($event.id, $event.target);
+        }
         break;
     }
   }
@@ -142,5 +155,15 @@ export class EmulationComponent implements OnDestroy {
       [id1, id2] = result;
     }
     this.matrix = this.matrixService.deleteEdge(this.matrix, id1, id2);
+  }
+
+  private initToggle(id: string, type: 'node' | 'edge'): void {
+    const items = type === 'node' ? this.disabledNodes : this.disabledEdges;
+    const index = items.indexOf(id);
+    if (index > -1) {
+      items.splice(index, 1);
+    } else {
+      items.push(id);
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { DELAY, PRESENT } from '../../_@shared/utils/constants';
 import { RandomService } from '../../_@shared/services/random.service';
-import { Item } from './item';
+import { Item, Node, Edge } from './item';
 
 export interface State {
   started: boolean,
@@ -16,8 +16,8 @@ export class EmulationService {
 
   private started = false;
   private paused = false;
-  private nodes = [];
-  private edges = [];
+  private nodes: Node[] = [];
+  private edges: Edge[] = [];
 
   constructor(
     private random: RandomService
@@ -30,17 +30,25 @@ export class EmulationService {
 
   public stop(): void {
     this.started = false;
-    this.paused = false;
+    this.paused = true;
     this.nodes = [];
     this.edges = [];
     this.publishState();
   }
 
-  public toggle(): void {
+  public toggle(id: string, type: 'node' | 'edge'): void {
+    const items: Item[] = type === 'node' ? this.nodes : this.edges;
+    const item = items.find(item => item.id === id);
 
+    if (item) {
+      item.active = !item.active;
+    } else {
+      console.error('No item with such id ', id, ' and type ', type);
+    }
   }
 
-  public start(matrix: string[][]): void {
+  public start(matrix: string[][],
+               disabledNodes: string[], disabledEdges: string[]): void {
     this.started = true;
     this.paused = false;
     this.publishState();
@@ -48,6 +56,7 @@ export class EmulationService {
     // initialization
     this.createNodes(matrix);
     this.createEdges(matrix);
+    this.disable(disabledNodes, disabledEdges);
 
     // start
     const id = this.random.randomInt(0, matrix.length - 1);
@@ -70,7 +79,7 @@ export class EmulationService {
     let newItems = [];
     for (let item of items) {
       const items1 = item.pass();
-      newItems = newItems.concat(items1);
+      newItems = newItems.concat(items1); // TODO Add unique values only!!!
     }
 
     if (!newItems.length) {
@@ -78,7 +87,7 @@ export class EmulationService {
       return;
     }
 
-    setTimeout(() => this.call(newItems), DELAY);
+    setTimeout(() => this.call(Array.from(new Set(newItems))), DELAY);
   }
 
   private publishState(): void {
@@ -90,7 +99,7 @@ export class EmulationService {
 
   private createNodes(matrix: string[][]): void {
     for (let i = 0; i < matrix.length; i++) {
-      let node = new Item(i);
+      let node = new Node(i);
       this.nodes.push(node);
     }
   }
@@ -103,7 +112,7 @@ export class EmulationService {
         if (matrix[i][j] === PRESENT) {
           const node1 = this.nodes[i];
           const node2 = this.nodes[j];
-          const edge = new Item(i, j);
+          const edge = new Edge(i, j);
           edge.links.push(node1, node2);
           node1.links.push(edge);
           node2.links.push(edge);
@@ -111,5 +120,10 @@ export class EmulationService {
         }
       }
     }
+  }
+
+  private disable(disabledNodes: string[], disabledEdges: string[]): void {
+    disabledNodes.forEach(id => this.toggle(id, 'node'));
+    disabledEdges.forEach(id => this.toggle(id, 'edge'));
   }
 }
