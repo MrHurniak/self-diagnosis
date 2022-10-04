@@ -29,6 +29,7 @@ export class Node implements Item {
 
   private result;
   private stopped = false;
+  private callStack = [];
 
   constructor(id: number,
               initValue,
@@ -47,10 +48,12 @@ export class Node implements Item {
     if (this.stopped) {
       return;
     }
+    console.log('stop', this.id);
     this.processing.emit({ id: this.id, value: true, type: 'stop', });
 
     this.stopped = true;
     this.result = null; // !reset
+    this.callStack = [];
 
     setTimeout(() => {
       this.links.filter(edge => edge.id !== id)
@@ -77,34 +80,34 @@ export class Node implements Item {
 
     console.log('pass', this.id);
 
-    const validEdges: Edge[] = [];
-    for (let edge of this.links) {
+    this.links.filter(edge => edge.id !== id)
+      .forEach(edge => this.callStack.push(edge)); // TODO try to push unique
 
-      if (edge.id === id) {
-        continue; // !do not send back
-      }
-
-      const edgeActive = edge.isActive(); // !validity check
-      if (edgeActive) {
-        validEdges.push(edge);
-      }
-    }
-
-    setTimeout(
-      () => this.call(validEdges, this.id, this.result),
-      DELAY
-    );
+    setTimeout(() => this.call(), DELAY);
   }
 
-  private call(edges, id, result): void {
-    if (this.state.paused) {
-      setTimeout(() => this.call(edges, id, result), DELAY);
+  private call(): void {
+    if (!this.isActive() || !this.state.started || this.stopped) {
       return;
     }
 
-    edges.forEach(edge => edge.pass(id, result));
+    if (this.state.paused) {
+      setTimeout(() => this.call(), DELAY);
+      return;
+    }
 
-    this.processing.emit({ id, value: false, type: 'processing', });
+    if (!this.callStack.length) {
+      this.processing.emit({ id: this.id , value: false, type: 'processing', });
+      return;
+    }
+
+    let edge = this.callStack.shift();
+
+    const edgeActive = edge.isActive();
+    this.updateResult(edge, edgeActive);
+    edge.pass(this.id, this.result);
+
+    setTimeout(() => this.call(), DELAY);
   }
 
   private checkFinished(): boolean {
@@ -113,6 +116,9 @@ export class Node implements Item {
 
   private append(result): void {
     this.result--;
+  }
+
+  private updateResult(edge: Edge, active: boolean): void {
   }
 }
 
