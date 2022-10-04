@@ -7,41 +7,73 @@ import {
 } from '../../_@shared/utils/constants';
 import { Processing, State } from './emulation.service';
 import { EventEmitter } from '@angular/core';
+import { copy } from '../../_@shared/utils/common.util';
 
 export interface Item {
 
-  id: string;
+  readonly id: string;
   active: boolean;
 
-  pass(id: string, result: string[][]): void;
+  pass(id: string, result): void;
+
+  stop(id: string): void;
 
   isActive(): boolean;
 }
 
 export class Node implements Item {
 
-  public id;
+  public readonly id;
   public active = true;
   public links: Edge[] = [];
 
-  private result: string[][] = null;
+  private result;
+  private stopped = false;
 
   constructor(id: number,
+              initValue,
               private state: State,
-              private processing: EventEmitter<Processing>) {
+              private processing: EventEmitter<Processing>,
+              private diagnostic: EventEmitter<string>) {
     this.id = `${id}`;
+    this.result = copy(initValue);
   }
 
   isActive(): boolean {
     return this.active;
   }
 
-  pass(id: string, result: string[][]): void {
-    if (!this.isActive() || !this.state.started) {
+  stop(id: string): void {
+    if (this.stopped) {
+      return;
+    }
+    this.processing.emit({ id: this.id, value: true, type: 'stop', });
+
+    this.stopped = true;
+    this.result = null; // !reset
+
+    setTimeout(() => {
+      this.links.filter(edge => edge.id !== id)
+        .forEach(edge => edge.stop(this.id));
+
+      this.processing.emit({ id: this.id, value: false, type: 'stop', });
+    }, DELAY);
+  }
+
+  pass(id: string, result): void {
+    if (!this.isActive() || !this.state.started || this.stopped) {
       return;
     }
 
-    this.processing.emit({ id: this.id, value: true, });
+    this.processing.emit({ id: this.id, value: true, type: 'processing', });
+
+    this.append(result); // !merge results
+
+    if (this.checkFinished()) { // !check finished
+      this.diagnostic.emit(this.id);
+      this.stop(null);
+      return;
+    }
 
     console.log('pass', this.id);
 
@@ -72,32 +104,21 @@ export class Node implements Item {
 
     edges.forEach(edge => edge.pass(id, result));
 
-    this.processing.emit({ id, value: false, });
+    this.processing.emit({ id, value: false, type: 'processing', });
   }
 
-  private updateResult(edge: Edge, active: boolean): void {
-    const id1 = parseInt(this.id, 10);
-    const id2Str = edge.id.split(IDS_DELIMITER).find(id => id !== this.id);
-    const id2 = parseInt(id2Str, 10);
-
-    this.result[id1][id2] = active ? PRESENT : ERROR;
+  private checkFinished(): boolean {
+    return this.result < 0;
   }
 
-  private append(appender: string[][]): void {
-    for (let i = 0; i < this.result.length; i++) {
-      for (let j = 0; j < this.result[i].length; j++) {
-        if (this.result[i][j] !== UNKNOWN) {
-          continue;
-        }
-        this.result[i][j] = appender[i][j];
-      }
-    }
+  private append(result): void {
+    this.result--;
   }
 }
 
 export class Edge implements Item {
 
-  public id;
+  public readonly id;
   public active = true;
   public links: Node[] = [];
 
@@ -112,14 +133,25 @@ export class Edge implements Item {
       && !this.links.some(node => !node.isActive());
   }
 
-  pass(id: string, result: string[][]): void {
+  stop(id: string): void {
+    this.processing.emit({ id: this.id, value: true, type: 'stop', });
+
+    setTimeout(() => {
+      this.links.filter(node => node.id !== id)
+        .forEach(node => node.stop(this.id));
+
+      this.processing.emit({ id: this.id, value: false, type: 'stop', });
+    }, DELAY);
+  }
+
+  pass(id: string, result): void {
     if (!this.isActive || !this.state.started) {
       return;
     }
 
-    this.processing.emit({ id: this.id, value: true, });
+    this.processing.emit({ id: this.id, value: true, type: 'processing', });
 
-    console.log('pass', this.id);
+    console.log('pass', this.id, id);
 
     const validNodes = this.links.filter(node => node?.id !== id);
 
@@ -137,6 +169,6 @@ export class Edge implements Item {
 
     validNodes.forEach(node => node.pass(id, result));
 
-    this.processing.emit({ id, value: false, });
+    this.processing.emit({ id, value: false, type: 'processing', });
   }
 }

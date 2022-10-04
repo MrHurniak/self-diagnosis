@@ -9,7 +9,6 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { NumberDialogComponent } from './number-dialog/number-dialog.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EdgeDialogComponent } from './edge-dialog/edge-dialog.component';
-import { SimulationService } from './services/simulation.service';
 import { RandomService } from './services/random.service';
 import { MatrixService } from './services/matrix.service';
 
@@ -34,7 +33,6 @@ import { MatrixService } from './services/matrix.service';
   providers: [
     NgbActiveModal,
     ModalService,
-    SimulationService,
     RandomService,
     MatrixService,
   ]

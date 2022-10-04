@@ -26,7 +26,7 @@ export class EmulationComponent implements OnDestroy {
   public matrix: string[][];
   public result: string[][];
   public failures = [];
-  public selectedItems = [];
+  public selectedItems = {};
 
   public started = false;
   public running = false;
@@ -58,7 +58,7 @@ export class EmulationComponent implements OnDestroy {
 
     this.subscription.add(
       this.emulation.processing.subscribe(
-        event => this.updateDisabled(event)
+        event => this.updateHighlight(event)
       )
     );
 
@@ -83,7 +83,7 @@ export class EmulationComponent implements OnDestroy {
   public reset() {
     this.emulation.stop();
     this.failures = [];
-    this.selectedItems = [];
+    this.selectedItems = {};
     this.disabledEdges = [];
     this.disabledNodes = [];
     this.result = this.matrixService.initEmptyMatrix(this.size);
@@ -170,16 +170,17 @@ export class EmulationComponent implements OnDestroy {
     }
   }
 
-  private updateDisabled(event: Processing): void {
-    const index = this.selectedItems.indexOf(event.id);
+  private updateHighlight(event: Processing): void {
+    const itemExists = Object.keys(this.selectedItems).includes(event.id);
+
     if (event.value) {
-      if (index < 0) {
-        this.selectedItems.push(event.id);
+      if (!itemExists) {
+        this.selectedItems[event.id] = event.type;
       }
       return;
     }
-    if (index > -1) {
-      this.selectedItems.splice(index, 1);
+    if (itemExists) {
+      delete this.selectedItems[event.id];
     }
   }
 }

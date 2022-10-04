@@ -11,6 +11,7 @@ export interface State {
 export interface Processing {
   id: string,
   value: boolean,
+  type: 'processing' | 'stop',
 }
 
 @Injectable()
@@ -18,6 +19,7 @@ export class EmulationService {
 
   public readonly processing = new EventEmitter<Processing>();
   public readonly stateChange = new EventEmitter<State>();
+  private diagnosticInternalResult = new EventEmitter<string>();
 
   private state: State = {
     started: false,
@@ -29,7 +31,11 @@ export class EmulationService {
 
   constructor(
     private random: RandomService
-  ) { }
+  ) {
+    this.diagnosticInternalResult.subscribe(id => {
+      console.log('FINISH', id);
+    });
+  }
 
   public pause(): void {
     this.state.paused = !this.state.paused;
@@ -77,7 +83,12 @@ export class EmulationService {
 
   private createNodes(matrix: string[][]): void {
     for (let i = 0; i < matrix.length; i++) {
-      let node = new Node(i, this.state, this.processing);
+      let node = new Node(i,
+        matrix.length / 2, // init value
+        this.state,
+        this.processing,
+        this.diagnosticInternalResult
+      );
       this.nodes.push(node);
     }
   }

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { copy } from '../utils/common.util';
 import { EMPTY, PRESENT, UNKNOWN } from "../utils/constants";
 
 @Injectable()
@@ -12,7 +13,7 @@ export class MatrixService {
     }
     tmp.push(EMPTY);
     matrix.push(tmp);
-    return this.copy(matrix);
+    return copy(matrix);
   }
 
   public deleteNode(matrix: string[][],
@@ -60,10 +61,6 @@ export class MatrixService {
                    id1: number, id2: number, value: string) {
     matrix[id1][id2] = value;
     matrix[id2][id1] = value;
-    return this.copy(matrix);
-  }
-
-  private copy<T>(object: T): T {
-    return JSON.parse(JSON.stringify(object));
+    return copy(matrix);
   }
 }
