@@ -11,9 +11,9 @@ export class RandomService {
   private readonly probability = 0.5;
 
   public generateSize(): number {
-    return this.randomInt(
-      MIN_COUNT, MAX_COUNT
-    )
+    return RandomService.randomInt(
+      MIN_COUNT, MAX_COUNT + 1
+    );
   }
 
   public generateMatrix(size: number): string[][] {
@@ -32,10 +32,6 @@ export class RandomService {
     return res;
   }
 
-  public randomInt(min: number, max: number): number {
-    return Math.floor(min + Math.random() * (max - min + 1));
-  }
-
   private generateEmpty(size: number): string[][] {
     const res = [];
     for (let i = 0; i < size; i++) {
@@ -45,5 +41,9 @@ export class RandomService {
       }
     }
     return res;
+  }
+
+  public static randomInt(minInclusive: number, maxExclusive: number): number {
+    return Math.floor(minInclusive + Math.random() * (maxExclusive - minInclusive));
   }
 }

@@ -1,22 +1,22 @@
 import {
   DELAY,
-  ERROR,
   IDS_DELIMITER,
-  PRESENT,
-  UNKNOWN
+  PAUSE_DELAY,
+  RUN_PROBABILITY
 } from '../../_@shared/utils/constants';
 import { Processing, State } from './emulation.service';
 import { EventEmitter } from '@angular/core';
 import { copy } from '../../_@shared/utils/common.util';
+import { RandomService } from '../../_@shared/services/random.service';
 
 export interface Item {
 
   readonly id: string;
   active: boolean;
 
-  pass(id: string, result): void;
+  pass(callerId: string, result): void;
 
-  stop(id: string): void;
+  stop(stopId): void;
 
   isActive(): boolean;
 }
@@ -25,11 +25,11 @@ export class Node implements Item {
 
   public readonly id;
   public active = true;
-  public links: Edge[] = [];
+  public edges: Edge[] = [];
 
+  private readonly initValue;
   private result;
-  private stopped = false;
-  private callStack = [];
+  private stopId;
 
   constructor(id: number,
               initValue,
@@ -38,76 +38,78 @@ export class Node implements Item {
               private diagnostic: EventEmitter<string>) {
     this.id = `${id}`;
     this.result = copy(initValue);
+    this.initValue = initValue;
   }
 
   isActive(): boolean {
     return this.active;
   }
 
-  stop(id: string): void {
-    if (this.stopped) {
-      return;
-    }
-    console.log('stop', this.id);
-    this.processing.emit({ id: this.id, value: true, type: 'stop', });
+  stop(stopId): void {
+    this.callFunc(() => {
+      if (this.stopId === stopId || this.stopId > stopId) {
+        return;
+      }
 
-    this.stopped = true;
-    this.result = null; // !reset
-    this.callStack = [];
+      this.notifyProcess('stop', true);
+      console.log('stop', this.id);
 
-    setTimeout(() => {
-      this.links.filter(edge => edge.id !== id)
-        .forEach(edge => edge.stop(this.id));
+      this.result = copy(this.initValue); // !reset
+      this.stopId = stopId;
 
-      this.processing.emit({ id: this.id, value: false, type: 'stop', });
-    }, DELAY);
+      this.delay(() => this.callStop(stopId));
+    });
+  }
+
+  private callStop(stopId): void {
+    this.callFunc(() => {
+      this.edges.forEach(edge => edge.stop(stopId));
+      this.notifyProcess('stop', false);
+    });
+  }
+
+  process(): void {
+    this.callFunc(() => {
+      if (RUN_PROBABILITY < Math.random()) {
+        this.delay(() => this.process());
+        return;
+      }
+
+      console.log('start', this.id);
+      this.notifyProcess('processing', true);
+
+      const next = RandomService.randomInt(0, this.edges.length);
+      this.delay(() => this.callProcess(this.edges[next]));
+    });
+  }
+
+  private callProcess(edge: Edge): void {
+    this.callFunc(() => {
+      const edgeActive = edge.isActive();
+      this.updateResult(edge, edgeActive);
+
+      if (edgeActive) {
+        edge.pass(this.id, this.result);
+      }
+
+      this.notifyProcess('processing', false);
+      this.delay(() => this.process());
+    });
   }
 
   pass(id: string, result): void {
-    if (!this.isActive() || !this.state.started || this.stopped) {
-      return;
-    }
-
-    this.processing.emit({ id: this.id, value: true, type: 'processing', });
+    console.log('pass', this.id);
+    this.notifyProcess('processing', true);
 
     this.append(result); // !merge results
 
     if (this.checkFinished()) { // !check finished
       this.diagnostic.emit(this.id);
-      this.stop(null);
+      this.stop(Date.now());
       return;
     }
 
-    console.log('pass', this.id);
-
-    this.links.filter(edge => edge.id !== id)
-      .forEach(edge => this.callStack.push(edge)); // TODO try to push unique
-
-    setTimeout(() => this.call(), DELAY);
-  }
-
-  private call(): void {
-    if (!this.isActive() || !this.state.started || this.stopped) {
-      return;
-    }
-
-    if (this.state.paused) {
-      setTimeout(() => this.call(), DELAY);
-      return;
-    }
-
-    if (!this.callStack.length) {
-      this.processing.emit({ id: this.id , value: false, type: 'processing', });
-      return;
-    }
-
-    let edge = this.callStack.shift();
-
-    const edgeActive = edge.isActive();
-    this.updateResult(edge, edgeActive);
-    edge.pass(this.id, this.result);
-
-    setTimeout(() => this.call(), DELAY);
+    this.delay(() => this.notifyProcess('processing', false));
   }
 
   private checkFinished(): boolean {
@@ -120,13 +122,34 @@ export class Node implements Item {
 
   private updateResult(edge: Edge, active: boolean): void {
   }
+
+  private notifyProcess(type, value: boolean) {
+    this.processing.emit({
+      id: this.id,
+      value,
+      type
+    });
+  }
+
+  private callFunc(callback: Function): void {
+    if (!this.state.started) return;
+    if (this.state.paused) {
+      this.delay(() => this.callFunc(callback), PAUSE_DELAY);
+      return;
+    }
+    callback();
+  }
+
+  private delay(callback: Function, delay = DELAY): void {
+    setTimeout(callback, delay);
+  }
 }
 
 export class Edge implements Item {
 
   public readonly id;
   public active = true;
-  public links: Node[] = [];
+  public nodes: Node[] = [];
 
   constructor(id1: number, id2: number,
               private state: State,
@@ -136,45 +159,58 @@ export class Edge implements Item {
 
   public isActive(): boolean {
     return this.active
-      && !this.links.some(node => !node.isActive());
+      && !this.nodes.some(node => !node.isActive());
   }
 
-  stop(id: string): void {
-    this.processing.emit({ id: this.id, value: true, type: 'stop', });
+  stop(stopId: string): void {
+    this.callFunc(() => {
+      this.notifyProcess('stop', true);
+      this.delay(() => this.callStop(stopId));
+    });
+  }
 
-    setTimeout(() => {
-      this.links.filter(node => node.id !== id)
-        .forEach(node => node.stop(this.id));
-
-      this.processing.emit({ id: this.id, value: false, type: 'stop', });
-    }, DELAY);
+  private callStop(stopId: string): void {
+    this.callFunc(() => {
+      this.nodes.forEach(node => node.stop(stopId));
+      this.notifyProcess('stop', false);
+    });
   }
 
   pass(id: string, result): void {
-    if (!this.isActive || !this.state.started) {
-      return;
-    }
+    this.callFunc(() => {
+      this.notifyProcess('processing', true);
 
-    this.processing.emit({ id: this.id, value: true, type: 'processing', });
+      const validNodes = this.nodes.filter(node => node?.id !== id);
 
-    console.log('pass', this.id, id);
-
-    const validNodes = this.links.filter(node => node?.id !== id);
-
-    setTimeout(
-      () => this.call(validNodes, this.id, result),
-      DELAY
-    );
+      this.delay(() => this.call(validNodes, result));
+    });
   }
 
-  private call(validNodes: Node[], id, result): void {
+  private call(validNodes: Node[], result): void {
+    this.callFunc(() => {
+      validNodes.forEach(node => node.pass(this.id, result));
+      this.notifyProcess('processing', false);
+    });
+  }
+
+  private notifyProcess(type, value: boolean) {
+    this.processing.emit({
+      id: this.id,
+      value,
+      type
+    });
+  }
+
+  private callFunc(callback: Function): void {
+    if (!this.state.started) return;
     if (this.state.paused) {
-      setTimeout(() => this.call(validNodes, id, result), DELAY);
+      this.delay(() => this.callFunc(callback), PAUSE_DELAY);
       return;
     }
+    callback();
+  }
 
-    validNodes.forEach(node => node.pass(id, result));
-
-    this.processing.emit({ id, value: false, type: 'processing', });
+  private delay(callback: Function, delay = DELAY): void {
+    setTimeout(callback, delay);
   }
 }

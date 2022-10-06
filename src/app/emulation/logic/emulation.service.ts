@@ -1,6 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { PRESENT } from '../../_@shared/utils/constants';
-import { RandomService } from '../../_@shared/services/random.service';
 import { Item, Node, Edge } from './item';
 
 export interface State {
@@ -29,9 +28,7 @@ export class EmulationService {
   private nodes: Node[] = [];
   private edges: Edge[] = [];
 
-  constructor(
-    private random: RandomService
-  ) {
+  constructor() {
     this.diagnosticInternalResult.subscribe(id => {
       console.log('FINISH', id);
     });
@@ -73,8 +70,7 @@ export class EmulationService {
     this.disable(disabledNodes, disabledEdges);
 
     // start
-    const id = this.random.randomInt(0, matrix.length - 1);
-    this.nodes[id].pass(null, null);
+    this.nodes.forEach(node => node.process());
   }
 
   private publishState(): void {
@@ -102,9 +98,9 @@ export class EmulationService {
           const node1 = this.nodes[i];
           const node2 = this.nodes[j];
           const edge = new Edge(i, j, this.state, this.processing);
-          edge.links.push(node1, node2);
-          node1.links.push(edge);
-          node2.links.push(edge);
+          edge.nodes.push(node1, node2);
+          node1.edges.push(edge);
+          node2.edges.push(edge);
           this.edges.push(edge);
         }
       }
