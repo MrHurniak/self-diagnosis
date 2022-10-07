@@ -1,14 +1,11 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import {
-  DEFAULT_COUNT,
-  RandomService
-} from '../_@shared/services/random.service';
+import { RandomService } from '../_@shared/services/random.service';
 import { GraphEvent } from './emulation.component.types';
 import { ModalService } from '../_@shared/modal-service/modal.service';
 import { MatrixService } from '../_@shared/services/matrix.service';
 import { Subscription } from 'rxjs';
-import { IDS_DELIMITER } from '../_@shared/utils/constants';
+import { DEFAULT_COUNT, IDS_DELIMITER } from '../_@shared/utils/constants';
 import { EmulationService, Processing } from './logic/emulation.service';
 import { ItemType } from './logic/emulation.types';
 

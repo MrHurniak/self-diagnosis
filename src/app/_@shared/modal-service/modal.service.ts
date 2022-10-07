@@ -7,6 +7,7 @@ import {
   NumberDialogComponent
 } from '../number-dialog/number-dialog.component';
 import { EdgeDialogComponent } from '../edge-dialog/edge-dialog.component';
+import { ConfigModalComponent } from '../config-modal/config-modal.component';
 
 @Injectable()
 export class ModalService {
@@ -42,5 +43,9 @@ export class ModalService {
 
     return edgeDialog.result
       .then(value => value, () => null);
+  }
+
+  public configs() {
+    this.modal.open(ConfigModalComponent);
   }
 }

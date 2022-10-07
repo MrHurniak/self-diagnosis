@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { EMPTY, NODE_LINK_PROBABILITY, PRESENT } from '../utils/constants';
+import { EMPTY, MAX_COUNT, MIN_COUNT, PRESENT } from '../utils/constants';
+import { NODE_LINK_PROBABILITY } from '../utils/configs';
+import { MatrixService } from './matrix.service';
 
-export const MIN_COUNT = 10;
-export const MAX_COUNT = 25;
-export const DEFAULT_COUNT = 18;
 
 @Injectable()
 export class RandomService {
@@ -15,7 +14,7 @@ export class RandomService {
   }
 
   public generateMatrix(size: number): string[][] {
-    const res: string[][] = this.generateEmpty(size);
+    const res: string[][] = MatrixService.initEmptyMatrix(size, EMPTY);
     for (let i = 0; i < size; i++) {
       for (let j = i; j < size; j++) {
         if (i === j) {
@@ -25,17 +24,6 @@ export class RandomService {
           res[i][j] = PRESENT;
           res[j][i] = PRESENT;
         }
-      }
-    }
-    return res;
-  }
-
-  private generateEmpty(size: number): string[][] {
-    const res = [];
-    for (let i = 0; i < size; i++) {
-      res.push([]);
-      for (let j = 0; j < size; j++) {
-        res[i].push(EMPTY);
       }
     }
     return res;

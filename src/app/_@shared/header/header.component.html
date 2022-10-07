@@ -1,13 +1,21 @@
 <div class="header">
   <div class="header-attributes">
-    <img class="logo" src="../assets/images/logo.svg" alt="KPI">
+    <img class="logo" src="../assets/images/logo.svg" alt="KPI"
+         (click)="loadMainPage()"
+    >
     <div>
       <h2 class="title">{{ title }}</h2>
       <h3 *ngIf="subtitle" class="subtitle">{{ subtitle }}</h3>
     </div>
   </div>
 
-  <div class="content">
-    <ng-content></ng-content>
+  <div class="content-container">
+    <div class="content">
+      <ng-content></ng-content>
+    </div>
+    <div class="config">
+      <img class="config-image" src="../assets/images/config.svg"
+           (click)="modalService.configs()">
+    </div>
   </div>
 </div>

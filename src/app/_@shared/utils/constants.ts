@@ -7,8 +7,7 @@ export const SUCCESS_CHECK = '0';
 
 export const IDS_DELIMITER = ':';
 
-export const DELAY = 2000;
-export const PAUSE_DELAY = 1000;
+export const MIN_COUNT = 10;
+export const MAX_COUNT = 25;
+export const DEFAULT_COUNT = 18;
 
-export const RUN_PROBABILITY = 0.25;
-export const NODE_LINK_PROBABILITY = 0.5;

@@ -1,4 +1,3 @@
-import * as CONFIG from '../../_@shared/utils/constants';
 import {
   DiagnosticInternalResult,
   Processing,
@@ -8,6 +7,13 @@ import { EventEmitter } from '@angular/core';
 import { copy } from '../../_@shared/utils/common.util';
 import { RandomService } from '../../_@shared/services/random.service';
 import { ProcessingEventType } from './emulation.types';
+import { DELAY, RUN_PROBABILITY, PAUSE_DELAY } from '../../_@shared/utils/configs';
+import {
+  ERROR_CHECK,
+  IDS_DELIMITER,
+  SUCCESS_CHECK,
+  UNKNOWN
+} from 'src/app/_@shared/utils/constants';
 
 export interface Item {
 
@@ -69,7 +75,7 @@ export class Node implements Item {
 
   process(): void {
     this.callFunc(() => {
-      if (CONFIG.RUN_PROBABILITY < Math.random() || !this.edges.length) {
+      if (RUN_PROBABILITY < Math.random() || !this.edges.length) {
         this.delay(() => this.process());
         return;
       }
@@ -121,8 +127,7 @@ export class Node implements Item {
     for (let i = 0; i < current.length; i++) {
       for (let j = 0; j < current[i].length; j++) {
         const value = result[i][j];
-        if (value !== CONFIG.UNKNOWN
-          && value !== CONFIG.EMPTY
+        if (value !== UNKNOWN
           && value !== current[i][j]
         ) {
           current[i][j] = value;
@@ -132,12 +137,12 @@ export class Node implements Item {
   }
 
   private updateResult(edge: Edge, active: boolean): void {
-    const id2 = edge.id.split(CONFIG.IDS_DELIMITER)
+    const id2 = edge.id.split(IDS_DELIMITER)
       .filter(id => id !== this.id)
       .map(id => parseInt(id, 10))[0];
     const id1 = parseInt(this.id, 10);
     const matrix = this.result.matrix;
-    const sign = active ? CONFIG.SUCCESS_CHECK : CONFIG.ERROR_CHECK;
+    const sign = active ? SUCCESS_CHECK : ERROR_CHECK;
 
     if (matrix[id1][id2] !== sign) {
       matrix[id1][id2] = sign;
@@ -155,13 +160,13 @@ export class Node implements Item {
   private callFunc(callback: Function): void {
     if (!this.state.started) return;
     if (this.state.paused) {
-      this.delay(() => this.callFunc(callback), CONFIG.PAUSE_DELAY);
+      this.delay(() => this.callFunc(callback), PAUSE_DELAY);
       return;
     }
     callback();
   }
 
-  private delay(callback: Function, delay = CONFIG.DELAY): void {
+  private delay(callback: Function, delay = DELAY): void {
     setTimeout(callback, delay);
   }
 }
@@ -175,7 +180,7 @@ export class Edge implements Item {
   constructor(id1: number, id2: number,
               private state: State,
               private processing: EventEmitter<Processing>) {
-    this.id = `${id1}${CONFIG.IDS_DELIMITER}${id2}`;
+    this.id = `${id1}${IDS_DELIMITER}${id2}`;
   }
 
   public isActive(): boolean {
@@ -225,13 +230,13 @@ export class Edge implements Item {
   private callFunc(callback: Function): void {
     if (!this.state.started) return;
     if (this.state.paused) {
-      this.delay(() => this.callFunc(callback), CONFIG.PAUSE_DELAY);
+      this.delay(() => this.callFunc(callback), PAUSE_DELAY);
       return;
     }
     callback();
   }
 
-  private delay(callback: Function, delay = CONFIG.DELAY): void {
+  private delay(callback: Function, delay = DELAY): void {
     setTimeout(callback, delay);
   }
 }

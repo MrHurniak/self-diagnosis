@@ -11,19 +11,21 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { EdgeDialogComponent } from './edge-dialog/edge-dialog.component';
 import { RandomService } from './services/random.service';
 import { MatrixService } from './services/matrix.service';
+import { ConfigModalComponent } from './config-modal/config-modal.component';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        RouterModule,
-        ReactiveFormsModule,
-    ],
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+  ],
   declarations: [
     ButtonComponent,
     HeaderComponent,
     ConfirmationModalComponent,
     NumberDialogComponent,
     EdgeDialogComponent,
+    ConfigModalComponent,
   ],
   exports: [
     ButtonComponent,

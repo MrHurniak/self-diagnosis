@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ModalService } from '../_@shared/modal-service/modal.service';
-import { MAX_COUNT, MIN_COUNT } from '../_@shared/services/random.service';
+import { MAX_COUNT, MIN_COUNT } from '../_@shared/utils/constants';
 
 @Component({
   templateUrl: './dashboard.component.html',
