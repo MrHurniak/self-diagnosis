@@ -1,5 +1,7 @@
+import { ItemType } from './logic/emulation.types';
+
 export interface GraphEvent {
   id?: string,
-  target: 'node' | 'edge',
+  target: ItemType,
   type: 'add' | 'delete' | 'toggle',
 }

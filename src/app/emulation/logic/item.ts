@@ -1,13 +1,13 @@
+import * as CONFIG from '../../_@shared/utils/constants';
 import {
-  DELAY,
-  IDS_DELIMITER,
-  PAUSE_DELAY,
-  RUN_PROBABILITY
-} from '../../_@shared/utils/constants';
-import { Processing, State } from './emulation.service';
+  DiagnosticInternalResult,
+  Processing,
+  State
+} from './emulation.service';
 import { EventEmitter } from '@angular/core';
 import { copy } from '../../_@shared/utils/common.util';
 import { RandomService } from '../../_@shared/services/random.service';
+import { ProcessingEventType } from './emulation.types';
 
 export interface Item {
 
@@ -35,7 +35,7 @@ export class Node implements Item {
               initValue,
               private state: State,
               private processing: EventEmitter<Processing>,
-              private diagnostic: EventEmitter<string>) {
+              private diagnostic: EventEmitter<DiagnosticInternalResult>) {
     this.id = `${id}`;
     this.result = copy(initValue);
     this.initValue = initValue;
@@ -52,7 +52,6 @@ export class Node implements Item {
       }
 
       this.notifyProcess('stop', true);
-      console.log('stop', this.id);
 
       this.result = copy(this.initValue); // !reset
       this.stopId = stopId;
@@ -70,12 +69,12 @@ export class Node implements Item {
 
   process(): void {
     this.callFunc(() => {
-      if (RUN_PROBABILITY < Math.random()) {
+      if (CONFIG.RUN_PROBABILITY < Math.random() || !this.edges.length) {
         this.delay(() => this.process());
         return;
       }
 
-      console.log('start', this.id);
+      console.log('START', this.id);
       this.notifyProcess('processing', true);
 
       const next = RandomService.randomInt(0, this.edges.length);
@@ -89,7 +88,7 @@ export class Node implements Item {
       this.updateResult(edge, edgeActive);
 
       if (edgeActive) {
-        edge.pass(this.id, this.result);
+        edge.pass(this.id, this.result.matrix);
       }
 
       this.notifyProcess('processing', false);
@@ -97,14 +96,13 @@ export class Node implements Item {
     });
   }
 
-  pass(id: string, result): void {
-    console.log('pass', this.id);
+  pass(id: string, result: string[][]): void {
     this.notifyProcess('processing', true);
 
     this.append(result); // !merge results
 
     if (this.checkFinished()) { // !check finished
-      this.diagnostic.emit(this.id);
+      this.diagnostic.emit({ nodeId: this.id, result: this.result.matrix });
       this.stop(Date.now());
       return;
     }
@@ -113,17 +111,40 @@ export class Node implements Item {
   }
 
   private checkFinished(): boolean {
-    return this.result < 0;
+    return this.result?.counter < 0;
   }
 
-  private append(result): void {
-    this.result--;
+  private append(result: string[][]): void {
+    this.result.counter--;
+    const current = this.result.matrix;
+
+    for (let i = 0; i < current.length; i++) {
+      for (let j = 0; j < current[i].length; j++) {
+        const value = result[i][j];
+        if (value !== CONFIG.UNKNOWN
+          && value !== CONFIG.EMPTY
+          && value !== current[i][j]
+        ) {
+          current[i][j] = value;
+        }
+      }
+    }
   }
 
   private updateResult(edge: Edge, active: boolean): void {
+    const id2 = edge.id.split(CONFIG.IDS_DELIMITER)
+      .filter(id => id !== this.id)
+      .map(id => parseInt(id, 10))[0];
+    const id1 = parseInt(this.id, 10);
+    const matrix = this.result.matrix;
+    const sign = active ? CONFIG.PRESENT : CONFIG.ERROR;
+
+    if (matrix[id1][id2] !== sign) {
+      matrix[id1][id2] = sign;
+    }
   }
 
-  private notifyProcess(type, value: boolean) {
+  private notifyProcess(type: ProcessingEventType, value: boolean) {
     this.processing.emit({
       id: this.id,
       value,
@@ -134,13 +155,13 @@ export class Node implements Item {
   private callFunc(callback: Function): void {
     if (!this.state.started) return;
     if (this.state.paused) {
-      this.delay(() => this.callFunc(callback), PAUSE_DELAY);
+      this.delay(() => this.callFunc(callback), CONFIG.PAUSE_DELAY);
       return;
     }
     callback();
   }
 
-  private delay(callback: Function, delay = DELAY): void {
+  private delay(callback: Function, delay = CONFIG.DELAY): void {
     setTimeout(callback, delay);
   }
 }
@@ -154,7 +175,7 @@ export class Edge implements Item {
   constructor(id1: number, id2: number,
               private state: State,
               private processing: EventEmitter<Processing>) {
-    this.id = `${id1}${IDS_DELIMITER}${id2}`;
+    this.id = `${id1}${CONFIG.IDS_DELIMITER}${id2}`;
   }
 
   public isActive(): boolean {
@@ -176,7 +197,7 @@ export class Edge implements Item {
     });
   }
 
-  pass(id: string, result): void {
+  pass(id: string, result: string[][]): void {
     this.callFunc(() => {
       this.notifyProcess('processing', true);
 
@@ -186,7 +207,7 @@ export class Edge implements Item {
     });
   }
 
-  private call(validNodes: Node[], result): void {
+  private call(validNodes: Node[], result: string[][]): void {
     this.callFunc(() => {
       validNodes.forEach(node => node.pass(this.id, result));
       this.notifyProcess('processing', false);
@@ -204,13 +225,13 @@ export class Edge implements Item {
   private callFunc(callback: Function): void {
     if (!this.state.started) return;
     if (this.state.paused) {
-      this.delay(() => this.callFunc(callback), PAUSE_DELAY);
+      this.delay(() => this.callFunc(callback), CONFIG.PAUSE_DELAY);
       return;
     }
     callback();
   }
 
-  private delay(callback: Function, delay = DELAY): void {
+  private delay(callback: Function, delay = CONFIG.DELAY): void {
     setTimeout(callback, delay);
   }
 }

@@ -57,6 +57,23 @@ export class MatrixService {
     return result;
   }
 
+  public static createInitial(matrix: string[][]): string[][] {
+    const result = [];
+
+    for (let i = 0; i < matrix.length; i++) {
+      const tempRow = [];
+      for (let j = 0; j < matrix[i].length; j++) {
+        if (matrix[i][j] === PRESENT) {
+          tempRow.push(UNKNOWN);
+        } else {
+          tempRow.push(EMPTY);
+        }
+      }
+      result.push(tempRow);
+    }
+    return result;
+  }
+
   private fillEdge(matrix: string[][],
                    id1: number, id2: number, value: string) {
     matrix[id1][id2] = value;

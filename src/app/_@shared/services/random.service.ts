@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EMPTY, PRESENT } from '../utils/constants';
+import { EMPTY, NODE_LINK_PROBABILITY, PRESENT } from '../utils/constants';
 
 export const MIN_COUNT = 10;
 export const MAX_COUNT = 25;
@@ -7,8 +7,6 @@ export const DEFAULT_COUNT = 18;
 
 @Injectable()
 export class RandomService {
-
-  private readonly probability = 0.5;
 
   public generateSize(): number {
     return RandomService.randomInt(
@@ -23,7 +21,7 @@ export class RandomService {
         if (i === j) {
           continue;
         }
-        if (Math.random() < this.probability) {
+        if (Math.random() < NODE_LINK_PROBABILITY) {
           res[i][j] = PRESENT;
           res[j][i] = PRESENT;
         }

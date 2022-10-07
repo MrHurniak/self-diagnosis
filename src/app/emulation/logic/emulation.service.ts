@@ -1,6 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import { PRESENT } from '../../_@shared/utils/constants';
-import { Item, Node, Edge } from './item';
+import { Edge, Item, Node } from './item';
+import { ItemType, ProcessingEventType } from './emulation.types';
+import { MatrixService } from '../../_@shared/services/matrix.service';
 
 export interface State {
   started: boolean,
@@ -10,7 +12,17 @@ export interface State {
 export interface Processing {
   id: string,
   value: boolean,
-  type: 'processing' | 'stop',
+  type: ProcessingEventType,
+}
+
+export interface DiagnosticResult {
+  result: string[][],
+  invalidNodes: string[],
+}
+
+export interface DiagnosticInternalResult {
+  nodeId: string,
+  result: string[][],
 }
 
 @Injectable()
@@ -18,7 +30,8 @@ export class EmulationService {
 
   public readonly processing = new EventEmitter<Processing>();
   public readonly stateChange = new EventEmitter<State>();
-  private diagnosticInternalResult = new EventEmitter<string>();
+  public readonly diagnosticResult = new EventEmitter<DiagnosticResult>();
+  private diagnosticInternalResult = new EventEmitter<DiagnosticInternalResult>();
 
   private state: State = {
     started: false,
@@ -29,8 +42,11 @@ export class EmulationService {
   private edges: Edge[] = [];
 
   constructor() {
-    this.diagnosticInternalResult.subscribe(id => {
-      console.log('FINISH', id);
+    this.diagnosticInternalResult.subscribe(info => {
+      this.diagnosticResult.emit({
+        result: info.result,
+        invalidNodes: []
+      });
     });
   }
 
@@ -47,8 +63,8 @@ export class EmulationService {
     this.publishState();
   }
 
-  public toggle(id: string, type: 'node' | 'edge'): void {
-    const items: Item[] = type === 'node' ? this.nodes : this.edges;
+  public toggle(id: string, type: ItemType): void {
+    const items: Item[] = (type === 'node') ? this.nodes : this.edges;
     const item = items.find(item => item.id === id);
 
     if (item) {
@@ -78,9 +94,14 @@ export class EmulationService {
   }
 
   private createNodes(matrix: string[][]): void {
+    const initValue = {
+      counter: 2 * matrix.length,
+      matrix: MatrixService.createInitial(matrix),
+    };
+
     for (let i = 0; i < matrix.length; i++) {
       let node = new Node(i,
-        matrix.length / 2, // init value
+        initValue,
         this.state,
         this.processing,
         this.diagnosticInternalResult

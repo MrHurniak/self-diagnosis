@@ -10,6 +10,7 @@ import { MatrixService } from '../_@shared/services/matrix.service';
 import { Subscription } from 'rxjs';
 import { IDS_DELIMITER } from '../_@shared/utils/constants';
 import { EmulationService, Processing } from './logic/emulation.service';
+import { ItemType } from './logic/emulation.types';
 
 @Component({
   templateUrl: './emulation.component.html',
@@ -66,6 +67,13 @@ export class EmulationComponent implements OnDestroy {
       this.emulation.stateChange.subscribe(state => {
         this.running = !state.paused;
         this.started = state.started;
+      })
+    );
+
+    this.subscription.add(
+      this.emulation.diagnosticResult.subscribe(info => {
+        this.result = info.result;
+        this.failures = info.invalidNodes;
       })
     );
   }
@@ -160,8 +168,8 @@ export class EmulationComponent implements OnDestroy {
     this.matrix = this.matrixService.deleteEdge(this.matrix, id1, id2);
   }
 
-  private initToggle(id: string, type: 'node' | 'edge'): void {
-    const items = type === 'node' ? this.disabledNodes : this.disabledEdges;
+  private initToggle(id: string, type: ItemType): void {
+    const items = (type === 'node') ? this.disabledNodes : this.disabledEdges;
     const index = items.indexOf(id);
     if (index > -1) {
       items.splice(index, 1);
