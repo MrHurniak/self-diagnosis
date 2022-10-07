@@ -68,7 +68,7 @@ export class GraphViewComponent {
   }
 
   toggle(element: Node | Edge): void {
-    element.disabled = !element.disabled; // TODO temp
+    element.disabled = !element.disabled;
 
     this.graphEvent.emit({
       id: element.id,

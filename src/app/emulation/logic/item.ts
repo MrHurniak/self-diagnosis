@@ -137,7 +137,7 @@ export class Node implements Item {
       .map(id => parseInt(id, 10))[0];
     const id1 = parseInt(this.id, 10);
     const matrix = this.result.matrix;
-    const sign = active ? CONFIG.PRESENT : CONFIG.ERROR;
+    const sign = active ? CONFIG.SUCCESS_CHECK : CONFIG.ERROR_CHECK;
 
     if (matrix[id1][id2] !== sign) {
       matrix[id1][id2] = sign;

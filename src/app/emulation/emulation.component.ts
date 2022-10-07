@@ -55,7 +55,6 @@ export class EmulationComponent implements OnDestroy {
 
   ngOnInit() {
     this.matrix = this.randomService.generateMatrix(this.size);
-    this.result = this.matrixService.initEmptyMatrix(this.size);
 
     this.subscription.add(
       this.emulation.processing.subscribe(
@@ -94,7 +93,7 @@ export class EmulationComponent implements OnDestroy {
     this.selectedItems = {};
     this.disabledEdges = [];
     this.disabledNodes = [];
-    this.result = this.matrixService.initEmptyMatrix(this.size);
+    this.result = null;
   }
 
   async handleGraphEvent($event: GraphEvent): Promise<void> {
@@ -127,7 +126,6 @@ export class EmulationComponent implements OnDestroy {
   private createNode(): void {
     this.matrix = this.matrixService.createNode(this.matrix);
     this.size = this.matrix.length;
-    this.result = this.matrixService.initEmptyMatrix(this.size);
   }
 
   private async createEdge(): Promise<void> {
@@ -150,7 +148,6 @@ export class EmulationComponent implements OnDestroy {
       this.matrix, parseInt(id, 10)
     );
     this.size = this.matrix.length;
-    this.result = this.matrixService.initEmptyMatrix(this.size);
   }
 
   private async deleteEdge(id?: string): Promise<void> {

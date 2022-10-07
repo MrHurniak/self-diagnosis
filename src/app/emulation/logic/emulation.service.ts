@@ -45,7 +45,7 @@ export class EmulationService {
     this.diagnosticInternalResult.subscribe(info => {
       this.diagnosticResult.emit({
         result: info.result,
-        invalidNodes: []
+        invalidNodes: this.findInvalid(info.result),
       });
     });
   }
@@ -96,7 +96,7 @@ export class EmulationService {
   private createNodes(matrix: string[][]): void {
     const initValue = {
       counter: 2 * matrix.length,
-      matrix: MatrixService.createInitial(matrix),
+      matrix: MatrixService.initEmptyMatrix(matrix.length),
     };
 
     for (let i = 0; i < matrix.length; i++) {
@@ -131,5 +131,9 @@ export class EmulationService {
   private disable(disabledNodes: string[], disabledEdges: string[]): void {
     disabledNodes.forEach(id => this.toggle(id, 'node'));
     disabledEdges.forEach(id => this.toggle(id, 'edge'));
+  }
+
+  private findInvalid(result: string[][]): string[] {
+    return [];
   }
 }

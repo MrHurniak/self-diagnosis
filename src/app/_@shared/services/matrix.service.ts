@@ -46,30 +46,13 @@ export class MatrixService {
     return this.fillEdge(matrix, id1, id2, PRESENT);
   }
 
-  public initEmptyMatrix(size: number, filler = UNKNOWN): string[][] {
+  public static initEmptyMatrix(size: number, filler = UNKNOWN): string[][] {
     const result = [];
     for (let i = 0; i < size; i++) {
       result[i] = [];
       for (let j = 0; j < size; j++) {
         result[i].push(filler);
       }
-    }
-    return result;
-  }
-
-  public static createInitial(matrix: string[][]): string[][] {
-    const result = [];
-
-    for (let i = 0; i < matrix.length; i++) {
-      const tempRow = [];
-      for (let j = 0; j < matrix[i].length; j++) {
-        if (matrix[i][j] === PRESENT) {
-          tempRow.push(UNKNOWN);
-        } else {
-          tempRow.push(EMPTY);
-        }
-      }
-      result.push(tempRow);
     }
     return result;
   }
