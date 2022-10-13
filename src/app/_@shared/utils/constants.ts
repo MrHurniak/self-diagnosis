@@ -2,8 +2,8 @@ export const PRESENT = '1';
 export const EMPTY = '0';
 export const UNKNOWN = '-';
 
-export const ERROR_CHECK = '1';
-export const SUCCESS_CHECK = '0';
+export const ERROR_STATE = '1';
+export const SUCCESS_STATE = '0';
 
 export const IDS_DELIMITER = ':';
 

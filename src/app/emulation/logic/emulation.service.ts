@@ -3,6 +3,7 @@ import { PRESENT } from '../../_@shared/utils/constants';
 import { Edge, Item, Node } from './item';
 import { ItemType, ProcessingEventType } from './emulation.types';
 import { MatrixService } from '../../_@shared/services/matrix.service';
+import { SyndromeAnalyzer } from './syndrome-analyzer.service';
 
 export interface State {
   started: boolean,
@@ -41,7 +42,9 @@ export class EmulationService {
   private nodes: Node[] = [];
   private edges: Edge[] = [];
 
-  constructor() {
+  constructor(
+    private analyzer: SyndromeAnalyzer,
+  ) {
     this.diagnosticInternalResult.subscribe(info => {
       this.diagnosticResult.emit({
         result: info.result,
@@ -134,6 +137,7 @@ export class EmulationService {
   }
 
   private findInvalid(result: string[][]): string[] {
-    return [];
+    return Array.from(this.analyzer.analyze(result),
+      ([name, value]) => (`${name}: ${value}`));
   }
 }

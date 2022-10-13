@@ -9,9 +9,9 @@ import { RandomService } from '../../_@shared/services/random.service';
 import { ProcessingEventType } from './emulation.types';
 import { DELAY, RUN_PROBABILITY, PAUSE_DELAY } from '../../_@shared/utils/configs';
 import {
-  ERROR_CHECK,
+  ERROR_STATE,
   IDS_DELIMITER,
-  SUCCESS_CHECK,
+  SUCCESS_STATE,
   UNKNOWN
 } from 'src/app/_@shared/utils/constants';
 
@@ -142,7 +142,7 @@ export class Node implements Item {
       .map(id => parseInt(id, 10))[0];
     const id1 = parseInt(this.id, 10);
     const matrix = this.result.matrix;
-    const sign = active ? SUCCESS_CHECK : ERROR_CHECK;
+    const sign = active ? SUCCESS_STATE : ERROR_STATE;
 
     if (matrix[id1][id2] !== sign) {
       matrix[id1][id2] = sign;

@@ -10,6 +10,7 @@
 
 .failures-container {
   display: flex;
+  flex-direction: column;
 
   .table-header {
     margin: auto 0;

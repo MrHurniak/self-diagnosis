@@ -6,6 +6,7 @@ import { TaskInfoComponent } from './task-info/task-info.component';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '../_@shared/shared.module';
 import { EmulationService } from './logic/emulation.service';
+import { SyndromeAnalyzer } from './logic/syndrome-analyzer.service';
 
 
 @NgModule({
@@ -23,6 +24,7 @@ import { EmulationService } from './logic/emulation.service';
   ],
   providers: [
     EmulationService,
+    SyndromeAnalyzer,
   ]
 })
 export class EmulationModule { }

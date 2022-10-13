@@ -18,11 +18,11 @@
 <section
   class="section failures-container"
 >
-  <h3 class="table-header">Виявлені відмови:</h3>
+  <h3 class="table-header">Ймовірності працездатності:</h3>
 
   <table>
-    <tr>
-      <td *ngFor="let node of failures">{{ node }}</td>
+    <tr *ngFor="let node of failures">
+      <td>{{ node }}</td>
     </tr>
   </table>
 </section>
