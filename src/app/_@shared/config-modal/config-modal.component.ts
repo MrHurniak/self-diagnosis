@@ -35,7 +35,9 @@ export class ConfigModalComponent implements OnInit, OnDestroy {
       runProbability: new FormControl(CONFIG.RUN_PROBABILITY,
         [Validators.min(0), Validators.max(1)]),
       nodeLinkProbability: new FormControl(CONFIG.NODE_LINK_PROBABILITY,
-        [Validators.min(0), Validators.max(1)])
+        [Validators.min(0), Validators.max(1)]),
+      coefOfSufficiency: new FormControl(CONFIG.COEFFICIENT_OF_SUFFICIENCY,
+        [Validators.min(0)]),
     });
 
     this.subscription.add(

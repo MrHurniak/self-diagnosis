@@ -4,6 +4,7 @@ import { Edge, Item, Node } from './item';
 import { ItemType, ProcessingEventType } from './emulation.types';
 import { MatrixService } from '../../_@shared/services/matrix.service';
 import { SyndromeAnalyzer } from './syndrome-analyzer.service';
+import { COEFFICIENT_OF_SUFFICIENCY } from '../../_@shared/utils/configs';
 
 export interface State {
   started: boolean,
@@ -98,7 +99,7 @@ export class EmulationService {
 
   private createNodes(matrix: string[][]): void {
     const initValue = {
-      counter: 2 * matrix.length,
+      counter: COEFFICIENT_OF_SUFFICIENCY * matrix.length,
       matrix: MatrixService.initEmptyMatrix(matrix.length),
     };
 
