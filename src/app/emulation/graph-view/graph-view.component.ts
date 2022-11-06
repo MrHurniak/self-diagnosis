@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { GraphEvent } from '../emulation.component.types';
 import { IDS_DELIMITER, PRESENT } from '../../_@shared/utils/constants';
 import { MathUtil } from '../../_@shared/utils/math.util';
+import { CAN_DISABLE_EDGE } from '../../_@shared/utils/configs';
 
 interface Node {
   id: string,
@@ -9,6 +10,7 @@ interface Node {
   y: number,
   color?: string,
   disabled?: boolean,
+  canDisable?: boolean,
 }
 
 interface Edge {
@@ -19,6 +21,7 @@ interface Edge {
   y2: number,
   color?: string,
   disabled?: boolean,
+  canDisable?: boolean,
 }
 
 @Component({
@@ -68,6 +71,10 @@ export class GraphViewComponent {
   }
 
   toggle(element: Node | Edge): void {
+    if (!element.canDisable) {
+      return;
+    }
+
     element.disabled = !element.disabled;
 
     this.graphEvent.emit({
@@ -137,6 +144,7 @@ export class GraphViewComponent {
         id: `${i}`,
         x: Math.round(posX + xCenter),
         y: Math.round(posY + yCenter),
+        canDisable: true,
       })
     }
     return nodes;
@@ -157,6 +165,7 @@ export class GraphViewComponent {
             y1: node1.y,
             x2: node2.x,
             y2: node2.y,
+            canDisable: CAN_DISABLE_EDGE,
           });
         }
       }

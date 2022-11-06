@@ -7,6 +7,7 @@ export let Q = 1 - P;
 
 export const PAUSE_DELAY = 1000;
 export const FALSE_PROBABILITY = 0.5;
+export const CAN_DISABLE_EDGE = false;
 
 export function update(values) {
   DELAY = values.delay;

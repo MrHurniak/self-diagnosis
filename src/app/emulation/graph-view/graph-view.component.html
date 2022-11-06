@@ -18,6 +18,7 @@
   </div>
   <div class="controls node-controls" *ngIf="selected">
     <app-button
+      [disabled]="!selected?.canDisable"
       (click)="toggle(selected); deselect()"
     >{{ selected.disabled ? 'Enable' : 'Disable' }}
     </app-button>
