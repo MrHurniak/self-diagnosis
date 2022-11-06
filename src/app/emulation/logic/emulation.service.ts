@@ -4,7 +4,10 @@ import { Edge, Item, Node } from './item';
 import { ItemType, ProcessingEventType } from './emulation.types';
 import { MatrixService } from '../../_@shared/services/matrix.service';
 import { SyndromeAnalyzer } from './syndrome-analyzer.service';
-import { COEFFICIENT_OF_SUFFICIENCY } from '../../_@shared/utils/configs';
+import {
+  ACCURACY,
+  COEFFICIENT_OF_SUFFICIENCY
+} from '../../_@shared/utils/configs';
 
 export interface State {
   started: boolean,
@@ -19,7 +22,8 @@ export interface Processing {
 
 export interface DiagnosticResult {
   result: string[][],
-  invalidNodes: string[],
+  probability: Map<string, number>,
+  meta: any
 }
 
 export interface DiagnosticInternalResult {
@@ -43,14 +47,18 @@ export class EmulationService {
   private nodes: Node[] = [];
   private edges: Edge[] = [];
 
+  private cycleStartTime;
+
   constructor(
     private analyzer: SyndromeAnalyzer,
   ) {
     this.diagnosticInternalResult.subscribe(info => {
-      this.diagnosticResult.emit({
-        result: info.result,
-        invalidNodes: this.findInvalid(info.result),
-      });
+      const startTime = this.cycleStartTime;
+      const stopTime = Date.now();
+      this.cycleStartTime = stopTime;
+
+      this.analyzer.analyzeAsync(info.result)
+        .then(p => this.publishResult(info.result, p, startTime, stopTime));
     });
   }
 
@@ -91,6 +99,7 @@ export class EmulationService {
 
     // start
     this.nodes.forEach(node => node.process());
+    this.cycleStartTime = Date.now();
   }
 
   private publishState(): void {
@@ -137,8 +146,30 @@ export class EmulationService {
     disabledEdges.forEach(id => this.toggle(id, 'edge'));
   }
 
-  private findInvalid(result: string[][]): string[] {
-    return Array.from(this.analyzer.analyze(result),
-      ([name, value]) => (`${name}: ${value}`));
+  private publishResult(result, probability, startTime, stopTime): void {
+    const isCorrect = this.isAnswerCorrect(probability);
+    const analysisTime = Date.now();
+
+    this.diagnosticResult.emit({
+      result,
+      probability,
+      meta: {
+        startTime,
+        stopTime,
+        analysisTime,
+        isCorrect,
+      }
+    })
+  }
+
+  private isAnswerCorrect(probability: Map<number, number>): boolean {
+    for (let i = 0; i < this.nodes.length; i++) {
+      const isNodeAlive = probability.get(i) > ACCURACY;
+      if (this.nodes[i].active != isNodeAlive) {
+        console.log(`Info about node ${i} is wrong`);
+        return false;
+      }
+    }
+    return true;
   }
 }

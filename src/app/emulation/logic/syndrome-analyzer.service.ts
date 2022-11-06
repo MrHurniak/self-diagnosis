@@ -7,6 +7,10 @@ import { FALSE_PROBABILITY, P, Q } from '../../_@shared/utils/configs';
 
 export class SyndromeAnalyzer {
 
+  async analyzeAsync(syndrome: string[][]): Promise<Map<number, number>> {
+    return new Promise(resolve => resolve(this.analyze(syndrome)))
+  }
+
   analyze(syndrome: string[][]): Map<number, number> {
     console.time('analyze');
 

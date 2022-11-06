@@ -6,7 +6,11 @@ import { ModalService } from '../_@shared/modal-service/modal.service';
 import { MatrixService } from '../_@shared/services/matrix.service';
 import { Subscription } from 'rxjs';
 import { DEFAULT_COUNT, IDS_DELIMITER } from '../_@shared/utils/constants';
-import { EmulationService, Processing } from './logic/emulation.service';
+import {
+  DiagnosticResult,
+  EmulationService,
+  Processing
+} from './logic/emulation.service';
 import { ItemType } from './logic/emulation.types';
 
 @Component({
@@ -69,7 +73,8 @@ export class EmulationComponent implements OnDestroy {
     this.subscription.add(
       this.emulation.diagnosticResult.subscribe(info => {
         this.result = info.result;
-        this.failures = info.invalidNodes;
+        this.failures = this.getFailures(info);
+        console.log(info.meta);
       })
     );
   }
@@ -184,5 +189,10 @@ export class EmulationComponent implements OnDestroy {
     if (itemExists) {
       delete this.selectedItems[event.id];
     }
+  }
+
+  private getFailures(info: DiagnosticResult): string[] {
+    return Array.from(info.probability,
+      ([name, value]) => (`${name}: ${value}`));
   }
 }

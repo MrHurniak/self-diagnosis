@@ -38,6 +38,8 @@ export class ConfigModalComponent implements OnInit, OnDestroy {
         [Validators.min(0), Validators.max(1)]),
       coefOfSufficiency: new FormControl(CONFIG.COEFFICIENT_OF_SUFFICIENCY,
         [Validators.min(0)]),
+      accuracy: new FormControl(CONFIG.ACCURACY,
+        [Validators.min(0), Validators.max(1)]),
     });
 
     this.subscription.add(
