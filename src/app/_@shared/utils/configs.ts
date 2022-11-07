@@ -11,10 +11,37 @@ export const PAUSE_DELAY = 1000;
 export const FALSE_PROBABILITY = 0.5;
 export const CAN_DISABLE_EDGE = false;
 
-export function update(values) {
-  DELAY = values.delay;
-  RUN_PROBABILITY = values.runProbability;
-  NODE_LINK_PROBABILITY = values.nodeLinkProbability;
-  COEFFICIENT_OF_SUFFICIENCY = values.coefOfSufficiency;
-  ACCURACY = values.accuracy;
+restoreSettings();
+
+export function update(settings, save = true) {
+  if (!settings) return;
+
+  DELAY = settings.delay || DELAY;
+  RUN_PROBABILITY = settings.runProbability || RUN_PROBABILITY;
+  NODE_LINK_PROBABILITY = settings.nodeLinkProbability || NODE_LINK_PROBABILITY;
+  COEFFICIENT_OF_SUFFICIENCY = settings.coefOfSufficiency || COEFFICIENT_OF_SUFFICIENCY;
+  ACCURACY = settings.accuracy || ACCURACY;
+
+  if (save) {
+    saveSettings();
+  }
+}
+
+function saveSettings(): void {
+  const configs = {
+    delay: DELAY,
+    runProbability: RUN_PROBABILITY,
+    nodeLinkProbability: NODE_LINK_PROBABILITY,
+    coefOfSufficiency: COEFFICIENT_OF_SUFFICIENCY,
+    accuracy: ACCURACY,
+  };
+
+  localStorage.setItem('settings', JSON.stringify(configs));
+}
+
+function restoreSettings(): void {
+  update(
+    JSON.parse(localStorage.getItem('settings')),
+    false
+  );
 }
