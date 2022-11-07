@@ -20,7 +20,7 @@
     <app-button
       [disabled]="!selected?.canDisable"
       (click)="toggle(selected); deselect()"
-    >{{ selected.disabled ? 'Enable' : 'Disable' }}
+    >{{ isDisabled(selected) ? 'Enable' : 'Disable' }}
     </app-button>
     <app-button
       [disabled]="editDisabled"

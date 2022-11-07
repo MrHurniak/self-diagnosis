@@ -21,14 +21,12 @@ export class EmulationComponent implements OnDestroy {
 
   private subscription = new Subscription();
 
-  private disabledNodes: string[] = [];
-  private disabledEdges: string[] = [];
-
   public size: number;
   public matrix: string[][];
   public result: string[][];
   public failures = [];
   public selectedItems = {};
+  public disabledItems: string[] = [];
 
   public started = false;
   public running = false;
@@ -81,9 +79,7 @@ export class EmulationComponent implements OnDestroy {
 
   public run() {
     if (!this.started) {
-      this.emulation.start(this.matrix, this.disabledNodes, this.disabledEdges);
-      this.disabledNodes = [];
-      this.disabledEdges = [];
+      this.emulation.start(this.matrix, this.disabledItems);
       return;
     }
     this.emulation.pause();
@@ -93,8 +89,7 @@ export class EmulationComponent implements OnDestroy {
     this.emulation.stop();
     this.failures = [];
     this.selectedItems = {};
-    this.disabledEdges = [];
-    this.disabledNodes = [];
+    this.disabledItems = [];
     this.result = null;
   }
 
@@ -115,11 +110,7 @@ export class EmulationComponent implements OnDestroy {
         }
         break;
       case 'toggle':
-        if (this.started) {
-          this.emulation.toggle($event.id, $event.target);
-        } else {
-          this.initToggle($event.id, $event.target);
-        }
+        this.toggle($event.id, $event.target);
         break;
     }
   }
@@ -167,13 +158,17 @@ export class EmulationComponent implements OnDestroy {
     this.matrix = this.matrixService.deleteEdge(this.matrix, id1, id2);
   }
 
-  private initToggle(id: string, type: ItemType): void {
-    const items = (type === 'node') ? this.disabledNodes : this.disabledEdges;
-    const index = items.indexOf(id);
-    if (index > -1) {
-      items.splice(index, 1);
+  private toggle(id: string, type: ItemType): void {
+    const index = this.disabledItems.indexOf(id);
+    const isActive = index > -1;
+    if (isActive) {
+      this.disabledItems.splice(index, 1);
     } else {
-      items.push(id);
+      this.disabledItems.push(id);
+    }
+
+    if (this.started) {
+      this.emulation.setItemActive(id, isActive, type);
     }
   }
 

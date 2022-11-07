@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable } from '@angular/core';
-import { PRESENT } from '../../_@shared/utils/constants';
+import { IDS_DELIMITER, PRESENT } from '../../_@shared/utils/constants';
 import { Edge, Item, Node } from './item';
 import { ItemType, ProcessingEventType } from './emulation.types';
 import { MatrixService } from '../../_@shared/services/matrix.service';
@@ -75,19 +75,18 @@ export class EmulationService {
     this.publishState();
   }
 
-  public toggle(id: string, type: ItemType): void {
+  public setItemActive(id: string, active: boolean, type: ItemType): void {
     const items: Item[] = (type === 'node') ? this.nodes : this.edges;
     const item = items.find(item => item.id === id);
 
     if (item) {
-      item.active = !item.active;
+      item.active = active;
     } else {
       console.error('No item with such id ', id, ' and type ', type);
     }
   }
 
-  public start(matrix: string[][],
-               disabledNodes: string[], disabledEdges: string[]): void {
+  public start(matrix: string[][], disabled: string[]): void {
     this.state.started = true;
     this.state.paused = false;
     this.publishState();
@@ -95,7 +94,7 @@ export class EmulationService {
     // initialization
     this.createNodes(matrix);
     this.createEdges(matrix);
-    this.disable(disabledNodes, disabledEdges);
+    this.disable(disabled);
 
     // start
     this.nodes.forEach(node => node.process());
@@ -141,9 +140,9 @@ export class EmulationService {
     }
   }
 
-  private disable(disabledNodes: string[], disabledEdges: string[]): void {
-    disabledNodes.forEach(id => this.toggle(id, 'node'));
-    disabledEdges.forEach(id => this.toggle(id, 'edge'));
+  private disable(disabled: string[]): void {
+    disabled.forEach(id => this.setItemActive(id, false,
+      id.includes(IDS_DELIMITER) ? 'edge' : 'node'));
   }
 
   private publishResult(result, probability, startTime, stopTime): void {
@@ -159,7 +158,7 @@ export class EmulationService {
         analysisTime,
         isCorrect,
       }
-    })
+    });
   }
 
   private isAnswerCorrect(probability: Map<number, number>): boolean {

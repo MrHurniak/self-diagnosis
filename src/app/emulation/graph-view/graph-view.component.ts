@@ -9,7 +9,6 @@ interface Node {
   x: number,
   y: number,
   color?: string,
-  disabled?: boolean,
   canDisable?: boolean,
 }
 
@@ -20,7 +19,6 @@ interface Edge {
   x2: number,
   y2: number,
   color?: string,
-  disabled?: boolean,
   canDisable?: boolean,
 }
 
@@ -34,6 +32,7 @@ export class GraphViewComponent {
   @Output() graphEvent = new EventEmitter<GraphEvent>()
   @Input() editDisabled = false;
   @Input() highlighted = {};
+  @Input() disabled: string[] = [];
 
   public readonly width = 700;
   public readonly height = 500;
@@ -43,8 +42,6 @@ export class GraphViewComponent {
 
   edges: Edge[] = [];
   nodes: Node[] = [];
-
-  constructor() { }
 
   @Input()
   set matrix(matrix: string[][]) {
@@ -67,15 +64,13 @@ export class GraphViewComponent {
     if (this.selected === element) {
       return 'blue';
     }
-    return element.disabled ? 'gray' : 'black';
+    return this.isDisabled(element) ? 'gray' : 'black';
   }
 
   toggle(element: Node | Edge): void {
     if (!element.canDisable) {
       return;
     }
-
-    element.disabled = !element.disabled;
 
     this.graphEvent.emit({
       id: element.id,
@@ -123,6 +118,10 @@ export class GraphViewComponent {
       target: 'edge',
       type: 'delete',
     });
+  }
+
+  isDisabled(element: Node | Edge): boolean {
+    return this.disabled.indexOf(element.id) > -1;
   }
 
   private createNodes(count: number): Node[] {
