@@ -32,4 +32,16 @@ export class RandomService {
   public static randomInt(minInclusive: number, maxExclusive: number): number {
     return Math.floor(minInclusive + Math.random() * (maxExclusive - minInclusive));
   }
+
+  public static randomSample(size: number, count: number): number[] {
+    const bucket = [...new Array(size).keys()];
+    const result = [];
+
+    while (result.length < count) {
+      let index = Math.floor(Math.random() * bucket.length);
+      result.push(bucket.splice(index, 1)[0]);
+    }
+
+    return result;
+  }
 }

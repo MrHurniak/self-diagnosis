@@ -80,7 +80,6 @@ export class Node implements Item {
         return;
       }
 
-      console.log('START', this.id);
       this.notifyProcess('processing', true);
 
       const next = RandomService.randomInt(0, this.edges.length);

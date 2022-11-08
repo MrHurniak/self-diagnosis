@@ -2,8 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import * as CONFIG from '../utils/configs';
-import { debounceTime, Subscription } from 'rxjs';
 import { update } from '../utils/configs';
+import { debounceTime, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-config-modal',
@@ -40,6 +40,12 @@ export class ConfigModalComponent implements OnInit, OnDestroy {
         [Validators.min(0)]),
       accuracy: new FormControl(CONFIG.ACCURACY,
         [Validators.min(0), Validators.max(1)]),
+      testEnabled: new FormControl(CONFIG.TEST_ENABLED),
+      testDisabledNodesCount: new FormControl(CONFIG.TEST_DISABLED_NODES_COUNT,
+        [Validators.min(0)]),
+      testCycles: new FormControl(CONFIG.TEST_CYCLES,
+        [Validators.min(1)]),
+      testRegenerateMatrix: new FormControl(CONFIG.TEST_REGENERATE_MATRIX),
     });
 
     this.subscription.add(

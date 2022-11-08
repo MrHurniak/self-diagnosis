@@ -15,22 +15,30 @@ export class SyndromeAnalyzer {
     console.time('analyze');
 
     if (this.isZeroSyndrome(syndrome)) {
-      console.log('syndrome is zero');
-      return new Map();
+      console.debug('syndrome is zero');
+      return this.zeroSyndromeResult(syndrome.length);
     }
 
     const hypotheses = this.findValidHypotheses(syndrome);
-    console.log('Valid hypotheses', hypotheses);
+    console.debug('Valid hypotheses', hypotheses);
 
     const pHpAH = this.findPHpAH(hypotheses, syndrome);
     const hypothesisProbability = this.findHypothesisProbability(pHpAH);
-    console.log('probabilities', hypothesisProbability, hypotheses);
+    console.debug('probabilities', hypothesisProbability, hypotheses);
 
     const result = this.findFinalResult(hypothesisProbability, hypotheses, syndrome.length);
-    console.log('final result', result);
+    console.debug('final result', result);
 
     console.timeEnd('analyze');
     return result;
+  }
+
+  private zeroSyndromeResult(size: number): Map<number, number> {
+    return [...Array(size).keys()]
+      .reduce((prev, cur) => {
+        prev.set(cur, 1)
+        return prev;
+      }, new Map())
   }
 
   /**

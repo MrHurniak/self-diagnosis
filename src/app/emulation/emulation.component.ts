@@ -12,6 +12,12 @@ import {
   Processing
 } from './logic/emulation.service';
 import { ItemType } from './logic/emulation.types';
+import {
+  TEST_CYCLES,
+  TEST_DISABLED_NODES_COUNT,
+  TEST_ENABLED,
+  TEST_REGENERATE_MATRIX
+} from '../_@shared/utils/configs';
 
 @Component({
   templateUrl: './emulation.component.html',
@@ -30,6 +36,9 @@ export class EmulationComponent implements OnDestroy {
 
   public started = false;
   public running = false;
+
+  private testingCounter = TEST_CYCLES;
+  private testingResult = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -54,6 +63,9 @@ export class EmulationComponent implements OnDestroy {
 
   ngOnInit() {
     this.matrix = this.randomService.generateMatrix(this.size);
+    if (TEST_ENABLED && !this.disabledItems.length) {
+      this.generateDisabledItems();
+    }
 
     this.subscription.add(
       this.emulation.processing.subscribe(
@@ -72,9 +84,14 @@ export class EmulationComponent implements OnDestroy {
       this.emulation.diagnosticResult.subscribe(info => {
         this.result = info.result;
         this.failures = this.getFailures(info);
-        console.log(info.meta);
+        this.processMeta(info.meta);
       })
     );
+  }
+
+  private generateDisabledItems(): void {
+    this.disabledItems = RandomService.randomSample(this.size, TEST_DISABLED_NODES_COUNT)
+      .map(value => `${value}`);
   }
 
   public run() {
@@ -189,5 +206,52 @@ export class EmulationComponent implements OnDestroy {
   private getFailures(info: DiagnosticResult): string[] {
     return Array.from(info.probability,
       ([name, value]) => (`${name}: ${value}`));
+  }
+
+  private processMeta(meta): void {
+    if (!TEST_ENABLED) {
+      return;
+    }
+
+    this.testingCounter--;
+    this.testingResult.push(meta);
+
+    if (this.testingCounter < 1) {
+      this.stopTesting();
+      return;
+    }
+    this.nextTestingCycle();
+  }
+
+  private nextTestingCycle(): void {
+    this.reset();
+
+    this.generateDisabledItems();
+    if (TEST_REGENERATE_MATRIX) {
+      this.matrix = this.randomService.generateMatrix(this.size);
+    }
+
+    setTimeout(() => this.run(), 100);
+  }
+
+  private stopTesting(): void {
+    this.analyzeTestResult();
+
+    this.testingResult = [];
+    this.testingCounter = TEST_CYCLES;
+    this.reset();
+  }
+
+  private analyzeTestResult(): void {
+    console.log(this.testingResult);
+    let avgTime = 0;
+    let sumPos = 0;
+    for (let i = 0; i < this.testingResult.length; i++) {
+      const test = this.testingResult[i];
+      avgTime += test.analysisTime - test.startTime;
+      sumPos += test.isCorrect ? 1 : 0;
+    }
+    console.log('Avg time', avgTime / this.testingResult.length);
+    console.log('% ', sumPos / this.testingResult.length * 100);
   }
 }

@@ -165,7 +165,7 @@ export class EmulationService {
     for (let i = 0; i < this.nodes.length; i++) {
       const isNodeAlive = probability.get(i) > ACCURACY;
       if (this.nodes[i].active != isNodeAlive) {
-        console.log(`Info about node ${i} is wrong`);
+        console.error(`Info about node ${i} is wrong`, this.nodes[i].active, probability);
         return false;
       }
     }
