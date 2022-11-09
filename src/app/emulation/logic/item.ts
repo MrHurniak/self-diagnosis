@@ -24,7 +24,7 @@ export interface Item {
 
   stop(stopId): void;
 
-  isActive(): boolean;
+  isActive(callerId: string): boolean;
 }
 
 export class Node implements Item {
@@ -89,7 +89,8 @@ export class Node implements Item {
 
   private callProcess(edge: Edge): void {
     this.callFunc(() => {
-      const edgeActive = edge.isActive();
+      const edgeActive = edge.isActive(this.id);
+      console.log(edgeActive);
       this.updateResult(edge, edgeActive);
 
       if (edgeActive) {
@@ -182,9 +183,9 @@ export class Edge implements Item {
     this.id = `${id1}${IDS_DELIMITER}${id2}`;
   }
 
-  public isActive(): boolean {
+  public isActive(callerId: string): boolean {
     return this.active
-      && !this.nodes.some(node => !node.isActive());
+      && this.nodes.find(node => node.id !== callerId).isActive();
   }
 
   stop(stopId: string): void {
