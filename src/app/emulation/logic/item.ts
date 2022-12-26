@@ -90,7 +90,6 @@ export class Node implements Item {
   private callProcess(edge: Edge): void {
     this.callFunc(() => {
       const edgeActive = edge.isActive(this.id);
-      console.log(edgeActive);
       this.updateResult(edge, edgeActive);
 
       if (edgeActive) {

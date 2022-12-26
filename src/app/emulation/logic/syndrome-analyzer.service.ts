@@ -15,6 +15,7 @@ export class SyndromeAnalyzer {
     console.time('analyze');
 
     if (this.isZeroSyndrome(syndrome)) {
+      console.timeEnd('analyze');
       console.debug('syndrome is zero');
       return this.zeroSyndromeResult(syndrome.length);
     }

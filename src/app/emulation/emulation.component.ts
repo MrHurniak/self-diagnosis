@@ -16,7 +16,7 @@ import {
   TEST_CYCLES,
   TEST_DISABLED_NODES_COUNT,
   TEST_ENABLED,
-  TEST_REGENERATE_MATRIX
+  TEST_REGENERATE_MATRIX,
 } from '../_@shared/utils/configs';
 
 @Component({
@@ -235,15 +235,14 @@ export class EmulationComponent implements OnDestroy {
   }
 
   private stopTesting(): void {
+    this.reset();
     this.analyzeTestResult();
 
     this.testingResult = [];
     this.testingCounter = TEST_CYCLES;
-    this.reset();
   }
 
   private analyzeTestResult(): void {
-    console.log(this.testingResult);
     let avgTime = 0;
     let sumPos = 0;
     for (let i = 0; i < this.testingResult.length; i++) {
@@ -251,7 +250,8 @@ export class EmulationComponent implements OnDestroy {
       avgTime += test.analysisTime - test.startTime;
       sumPos += test.isCorrect ? 1 : 0;
     }
-    console.log('Avg time', avgTime / this.testingResult.length);
-    console.log('% ', sumPos / this.testingResult.length * 100);
+    console.log('Dis nodes:', TEST_DISABLED_NODES_COUNT ,
+      'Avg time:', avgTime / this.testingResult.length,
+      '\n% ', sumPos / this.testingResult.length * 100);
   }
 }

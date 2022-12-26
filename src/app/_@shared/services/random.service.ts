@@ -26,6 +26,23 @@ export class RandomService {
         }
       }
     }
+
+    // Experimental! Matrix correction - to minimize amount of unlinked nodes
+    for (let i = 0; i < size; i++) {
+      let edges = 0;
+
+      for (let j = i; j < size; j++) {
+        edges += (res[i][j] === PRESENT) ? 1 : 0;
+      }
+      if (edges <= 1) {
+        const sample = RandomService.randomSample(size, size * NODE_LINK_PROBABILITY - edges);
+        sample.filter(number => number !== i).forEach(number => {
+          res[i][number] = PRESENT;
+          res[number][i] = PRESENT;
+        });
+      }
+    }
+
     return res;
   }
 
