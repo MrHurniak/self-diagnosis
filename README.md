@@ -12,6 +12,8 @@ This algorithm was developed by [Oleg Barabash (Барабаш Олег Воло
 in research work "CONSTRUCTION OF FUNCTIONALLY SUSTAINABLE DISTRIBUTED INFORMATION SYSTEMS" 
 (ПОСТРОЕНИЕ ФУНКЦИОНАЛЬНО УСТОЙЧИВЫХ РАСПРЕДЕЛЕННЫХ ИНФОРМАЦИОННЫХ СИСТЕМ. Киев – 2004., 227c.)
 
+![Simulation.png](assets/Simulation.png)
+
 Simulation consists of next stages:
 1. Building of testing system (randomly or using control menu).
 2. Creating of failures in testing system - disabling of edges. This can be done manually at any point of time or
@@ -67,8 +69,9 @@ npm i
   ```shell
 npm run start
 ```
+4. Open the application in browser [localhost:4200](http://localhost:4200)
 
 
 ## TODO
-[ ] - implement Web worker to decode syndrome
-[ ] - improve matrix generation
+- [ ] Implement Web worker to decode syndrome
+- [ ] Improve matrix generation
